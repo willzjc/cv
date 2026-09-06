@@ -10,7 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
   <style>
     :root {
       --ink: #18211f;
@@ -2224,168 +2223,176 @@
         window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
 
-      function svgToPngDataUrl(svg) {
-        return new Promise((resolve) => {
-          const source = new XMLSerializer().serializeToString(svg);
-          const image = new Image();
-          const objectUrl = URL.createObjectURL(new Blob([source], { type: "image/svg+xml" }));
-          image.onload = () => {
-            const canvas = document.createElement("canvas");
-            canvas.width = 600;
-            canvas.height = 276;
-            const context = canvas.getContext("2d");
-            context.fillStyle = "#f5f7f5";
-            context.fillRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(image, 0, 0, canvas.width, canvas.height);
-            URL.revokeObjectURL(objectUrl);
-            resolve(canvas.toDataURL("image/png"));
-          };
-          image.onerror = () => {
-            URL.revokeObjectURL(objectUrl);
-            resolve(null);
-          };
-          image.src = objectUrl;
-        });
+      function wordText(node) {
+        return (node?.innerText || node?.textContent || "").replace(/\s+/g, " ").trim();
       }
 
-      async function wordDocumentHtml() {
-        const resume = document.querySelector("#resume").cloneNode(true);
-        resume.querySelector(".interaction-tip")?.remove();
-        resume.querySelector(".quick-career-summary")?.remove();
-        const projectVisuals = [...resume.querySelectorAll(".project-visual")];
-        await Promise.all(projectVisuals.map(async (visual) => {
-          const svg = visual.querySelector("svg");
-          if (!svg) {
-            visual.remove();
-            return;
-          }
-          const source = await svgToPngDataUrl(svg);
-          if (!source) {
-            visual.remove();
-            return;
-          }
-          const image = document.createElement("img");
-          image.src = source;
-          image.alt = "";
-          visual.replaceChildren(image);
+      async function buildWordDocument() {
+        const {
+          AlignmentType,
+          BorderStyle,
+          Document,
+          ExternalHyperlink,
+          LevelFormat,
+          Packer,
+          Paragraph,
+          TextRun,
+          UnderlineType
+        } = await import("https://cdn.jsdelivr.net/npm/docx@9.5.1/+esm");
+        const ink = "18211F";
+        const softInk = "53615D";
+        const teal = "116466";
+        const line = "D7DFDC";
+        const bulletReference = "resume-bullets";
+        const textRun = (text, options = {}) => new TextRun({ text, font: "Aptos", size: 20, color: ink, ...options });
+        const mutedRun = (text, options = {}) => textRun(text, { color: softInk, ...options });
+        const hyperlink = (text, link) => new ExternalHyperlink({
+          children: [textRun(text, { color: teal, underline: { type: UnderlineType.SINGLE } })],
+          link
+        });
+        const sectionHeading = (text) => new Paragraph({
+          children: [textRun(text, { bold: true, size: 28 })],
+          spacing: { before: 240, after: 100 },
+          border: { bottom: { color: line, style: BorderStyle.SINGLE, size: 4, space: 4 } },
+          keepNext: true
+        });
+        const children = [
+          new Paragraph({ children: [textRun(wordText(document.querySelector('[data-edit-id="name"]')), { bold: true, size: 44 })], spacing: { after: 20 } }),
+          new Paragraph({ children: [mutedRun(wordText(document.querySelector('[data-edit-id="headline"]')), { size: 24 })], spacing: { after: 70 } }),
+          new Paragraph({
+            children: [
+              mutedRun("Sydney, Australia | +61 451 952 945 | ", { size: 18 }),
+              hyperlink("willzjc@gmail.com", "mailto:willzjc@gmail.com")
+            ],
+            spacing: { after: 50 }
+          }),
+          new Paragraph({
+            children: [mutedRun("Interactive version: ", { size: 18 }), hyperlink("https://willzjc.github.io/cv/", "https://willzjc.github.io/cv/")],
+            spacing: { after: 140 }
+          }),
+          sectionHeading("Profile"),
+          new Paragraph({ children: [textRun(wordText(document.querySelector('[data-edit-id="profile-summary"]')))], spacing: { after: 120 } }),
+          sectionHeading("Experience")
+        ];
+
+        document.querySelectorAll(".role").forEach((role) => {
+          children.push(
+            new Paragraph({
+              children: [
+                textRun(wordText(role.querySelector(".company")), { bold: true, size: 24 }),
+                mutedRun(`  |  ${wordText(role.querySelector(".role-date"))}`, { size: 18 })
+              ],
+              spacing: { before: 140, after: 20 },
+              keepNext: true
+            }),
+            new Paragraph({
+              children: [mutedRun(wordText(role.querySelector(".role-title")), { bold: true, size: 18 })],
+              spacing: { after: 60 },
+              keepNext: true
+            })
+          );
+          role.querySelectorAll(".role-points > li").forEach((item) => {
+            children.push(new Paragraph({
+              children: [textRun(wordText(item))],
+              numbering: { reference: bulletReference, level: 0 },
+              spacing: { after: 45 },
+              keepLines: true
+            }));
+          });
+          children.push(new Paragraph({
+            children: [textRun("Tech stack: ", { bold: true, size: 16 }), mutedRun(wordText(role.querySelector(".tech-items")), { size: 16 })],
+            spacing: { after: 80 },
+            keepLines: true
+          }));
+        });
+
+        children.push(sectionHeading("Core capabilities"));
+        document.querySelectorAll(".capability-list > li").forEach((item) => {
+          children.push(new Paragraph({
+            children: [
+              textRun(`${wordText(item.querySelector("strong"))}: `, { bold: true }),
+              textRun(wordText(item.querySelector("span")))
+            ],
+            spacing: { after: 55 }
+          }));
+        });
+
+        children.push(sectionHeading("Education"));
+        const education = document.querySelector('[data-edit-id="education-copy"]');
+        children.push(new Paragraph({ children: [textRun(wordText(education.querySelector("strong")), { bold: true })], spacing: { after: 30 } }));
+        education.querySelectorAll("p").forEach((item) => children.push(new Paragraph({ children: [textRun(wordText(item))], spacing: { after: 45 } })));
+
+        children.push(sectionHeading("Recognition"));
+        document.querySelectorAll(".award-list > li").forEach((item) => {
+          children.push(new Paragraph({
+            children: [
+              textRun(wordText(item.querySelector("strong")), { bold: true }),
+              textRun(` ${wordText(item.querySelector("span"))}`)
+            ],
+            spacing: { after: 70 }
+          }));
+        });
+
+        children.push(
+          sectionHeading("Ways of working"),
+          new Paragraph({ children: [textRun(wordText(document.querySelector('[data-edit-id="methods-copy"]')))] }),
+          sectionHeading("Personal projects")
+        );
+        document.querySelectorAll(".project-card").forEach((project) => {
+          children.push(new Paragraph({
+            children: [
+              textRun(wordText(project.querySelector("h3")), { bold: true }),
+              textRun(` - ${wordText(project.querySelector(".project-copy p"))}`),
+              textRun(" "),
+              hyperlink(project.href, project.href)
+            ],
+            spacing: { after: 80 }
+          }));
+        });
+        children.push(new Paragraph({
+          children: [mutedRun("Will Chen | Sydney, Australia | willzjc@gmail.com", { size: 16 })],
+          spacing: { before: 220 },
+          alignment: AlignmentType.CENTER
         }));
-        resume.querySelectorAll(".project-arrow, svg").forEach((node) => node.remove());
-        resume.querySelectorAll("[contenteditable]").forEach((node) => node.removeAttribute("contenteditable"));
-        resume.querySelectorAll("[tabindex], [aria-describedby]").forEach((node) => {
-          node.removeAttribute("tabindex");
-          node.removeAttribute("aria-describedby");
+
+        const wordDocument = new Document({
+          creator: "Will Chen",
+          title: "Will Chen Resume",
+          description: "Will Chen - Senior Software Engineer and Engineering Lead",
+          numbering: {
+            config: [{
+              reference: bulletReference,
+              levels: [{
+                level: 0,
+                format: LevelFormat.BULLET,
+                text: "•",
+                alignment: AlignmentType.LEFT,
+                style: { paragraph: { indent: { left: 360, hanging: 180 } } }
+              }]
+            }]
+          },
+          styles: {
+            default: {
+              document: {
+                run: { font: "Aptos", size: 20, color: ink },
+                paragraph: { spacing: { line: 276, after: 70 } }
+              }
+            }
+          },
+          sections: [{
+            properties: { page: { margin: { top: 720, right: 720, bottom: 720, left: 720 } } },
+            children
+          }]
         });
-        resume.querySelectorAll("[style]").forEach((node) => node.removeAttribute("style"));
-        resume.querySelectorAll(".reveal").forEach((node) => node.classList.remove("reveal"));
-        resume.querySelectorAll(".tech-token").forEach((node) => {
-          node.removeAttribute("tabindex");
-          node.removeAttribute("aria-describedby");
-          node.removeAttribute("data-tech");
-        });
-
-        const contentGrid = resume.querySelector(".content-grid");
-        const experience = contentGrid.querySelector(".experience");
-        const roles = [...experience.querySelectorAll(".role")];
-        const continuation = document.createElement("section");
-        continuation.className = "experience word-page-two";
-        const continuationHeading = document.createElement("h2");
-        continuationHeading.className = "section-title";
-        continuationHeading.textContent = "Experience continued";
-        continuation.append(continuationHeading, ...roles.slice(3));
-        const columns = document.createElement("table");
-        columns.className = "word-columns";
-        const columnRow = columns.insertRow();
-        const mainColumn = columnRow.insertCell();
-        const sideColumn = columnRow.insertCell();
-        mainColumn.className = "word-main";
-        sideColumn.className = "word-side";
-        mainColumn.append(experience);
-        sideColumn.append(contentGrid.querySelector(".sidebar"));
-        contentGrid.replaceWith(columns);
-
-        const projects = resume.querySelector(".projects");
-        projects.before(continuation);
-        const projectsGrid = resume.querySelector(".projects-grid");
-        const projectTable = document.createElement("table");
-        projectTable.className = "word-projects";
-        const projectRow = projectTable.insertRow();
-        [...projectsGrid.children].forEach((project) => projectRow.insertCell().append(project));
-        projectsGrid.replaceWith(projectTable);
-
-        return `<!doctype html>
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Will Chen Resume</title>
-  <style>
-    @page { size: A4; margin: 12mm; }
-    body { margin: 0; color: #18211f; font-family: Aptos, Calibri, sans-serif; font-size: 9.5pt; line-height: 1.4; }
-    h1, h2, h3, p { margin-top: 0; }
-    .interactive-note { margin: 0 0 7pt; color: #53615d; font-size: 7.5pt; text-align: right; }
-    .interactive-note a { color: #116466; font-weight: 700; }
-    h1 { margin-bottom: 2pt; font-family: Georgia, serif; font-size: 28pt; font-weight: 400; }
-    h2, h3 { font-family: Georgia, serif; font-weight: 400; }
-    a { color: #116466; text-decoration: none; }
-    .resume { width: 100%; }
-    .identity { padding-bottom: 9pt; border-bottom: 1px solid #d7dfdc; }
-    .eyebrow, .section-kicker, .role-title, .sidebar-label, .project-index { color: #116466; font-size: 8pt; font-weight: 700; text-transform: uppercase; }
-    .headline { margin-bottom: 5pt; color: #53615d; font-family: Georgia, serif; font-size: 12pt; }
-    .contact-line span, .contact-line a { margin-right: 12pt; font-size: 8.5pt; }
-    .intro { padding: 9pt 0; }
-    .intro > div { display: table; width: 100%; }
-    .intro .section-kicker { display: table-cell; width: 72pt; padding-right: 12pt; vertical-align: top; }
-    .summary { display: table-cell; max-width: 100%; color: #53615d; font-size: 8.5pt; line-height: 1.35; }
-    .word-columns { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    .word-main { width: 72%; padding-right: 18pt; vertical-align: top; }
-    .word-side { width: 28%; padding-left: 14pt; vertical-align: top; border-left: 1px solid #d7dfdc; }
-    .word-page-two { page-break-before: always; }
-    .section-title { margin: 2pt 0 9pt; font-size: 16pt; }
-    .role { margin-bottom: 10pt; page-break-inside: auto; }
-    .role-header { margin-bottom: 4pt; page-break-after: avoid; }
-    .company-name-row { white-space: nowrap; }
-    .company { margin-bottom: 1pt; font-size: 12pt; }
-    .role-date { float: right; color: #72807c; font-size: 8pt; font-weight: 600; }
-    .role-points { margin: 0; padding-left: 14pt; color: #34413d; font-size: 7.3pt; line-height: 1.28; }
-    .role-points li { margin-bottom: 2pt; page-break-inside: avoid; }
-    .stack-line { margin-top: 4pt; color: #53615d; font-size: 6.5pt; line-height: 1.25; page-break-inside: avoid; }
-    .stack-line strong { margin-right: 6pt; color: #18211f; text-transform: uppercase; }
-    .tech-token { color: #116466; }
-    .sidebar { margin: 0; padding: 0; }
-    .sidebar-section { margin-bottom: 8pt; page-break-inside: avoid; }
-    .capability-list, .award-list { padding-left: 16pt; }
-    .capability-list li, .award-list li { margin-bottom: 4pt; }
-    .capability-list strong, .education-entry strong, .award-list strong { display: block; }
-    .capability-list span, .education-entry p, .award-list span { color: #53615d; font-size: 7.2pt; line-height: 1.3; }
-    .projects { margin-top: 11pt; padding-top: 8pt; border-top: 1px solid #d7dfdc; }
-    .word-projects { width: 100%; border-collapse: separate; border-spacing: 5pt; table-layout: fixed; }
-    .word-projects td { width: 33.33%; padding: 0; vertical-align: top; }
-    .project-card { display: block; min-height: 108pt; padding: 6pt; border: 1px solid #d7dfdc; page-break-inside: avoid; }
-    .project-visual img { display: block; width: 100%; height: 46pt; margin-bottom: 5pt; }
-    .project-copy h3 { margin: 2pt 0; font-size: 11pt; }
-    .project-copy p, .project-url { margin: 0; font-size: 6.7pt; line-height: 1.25; }
-    .project-url { display: block; margin-top: 3pt; color: #116466; }
-    .resume-footer { margin-top: 14pt; padding-top: 8pt; border-top: 1px solid #d7dfdc; color: #72807c; font-size: 7.5pt; }
-  </style>
-</head>
-<body>${resume.outerHTML}</body>
-</html>`;
+        return Packer.toBlob(wordDocument);
       }
 
       async function exportWord() {
         save(false);
         setStatus("Building Word document...");
         try {
-          const source = await wordDocumentHtml();
-          if (window.htmlDocx?.asBlob) {
-            const blob = window.htmlDocx.asBlob(source, {
-              orientation: "portrait",
-              margins: { top: 500, right: 500, bottom: 500, left: 500 }
-            });
-            downloadBlob(blob, "will-chen-resume.docx");
-          } else {
-            const fallback = new Blob(["\ufeff", source], { type: "application/msword;charset=utf-8" });
-            downloadBlob(fallback, "will-chen-resume.doc");
-          }
+          const blob = await buildWordDocument();
+          downloadBlob(blob, "will-chen-resume.docx");
           setStatus("Word document created");
         } catch (error) {
           setStatus("Word export failed");
