@@ -224,6 +224,20 @@
       box-shadow: var(--shadow);
     }
 
+    .interactive-note {
+      margin: 0 0 18px;
+      color: var(--soft-ink);
+      font-size: 11px;
+      text-align: right;
+    }
+
+    .interactive-note a {
+      color: var(--teal);
+      font-weight: 700;
+      overflow-wrap: anywhere;
+      text-underline-offset: 3px;
+    }
+
     .identity {
       padding-bottom: 24px;
       border-bottom: 1px solid var(--line);
@@ -1009,6 +1023,11 @@
         box-shadow: none !important;
       }
 
+      .interactive-note {
+        margin-bottom: 2.5mm;
+        font-size: 7.5pt;
+      }
+
       .identity {
         display: block !important;
         padding-bottom: 3mm !important;
@@ -1250,6 +1269,8 @@
   </div>
 
   <main class="resume" id="resume">
+    <p class="interactive-note">See the interactive version of this at <a href="https://willzjc.github.io/cv/">https://willzjc.github.io/cv/</a></p>
+
     <header class="identity reveal" style="--delay: 40ms">
       <div>
         <p class="eyebrow editable" data-edit-id="identity-kicker">Engineering leadership &middot; Cloud platforms &middot; Reliability</p>
@@ -1735,6 +1756,8 @@
     @page { size: A4; margin: 12mm; }
     body { margin: 0; color: #18211f; font-family: Aptos, Calibri, sans-serif; font-size: 9.5pt; line-height: 1.4; }
     h1, h2, h3, p { margin-top: 0; }
+    .interactive-note { margin: 0 0 7pt; color: #53615d; font-size: 7.5pt; text-align: right; }
+    .interactive-note a { color: #116466; font-weight: 700; }
     h1 { margin-bottom: 2pt; font-family: Georgia, serif; font-size: 28pt; font-weight: 400; }
     h2, h3 { font-family: Georgia, serif; font-weight: 400; }
     a { color: #116466; text-decoration: none; }
