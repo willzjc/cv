@@ -437,6 +437,23 @@
       line-height: 1.58;
     }
 
+    .interaction-tip {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .interaction-tip svg {
+      width: 14px;
+      height: 14px;
+      color: var(--teal);
+      stroke-width: 2;
+    }
+
     .section-heading-row {
       display: flex;
       align-items: end;
@@ -639,6 +656,31 @@
       color: currentColor;
     }
 
+    .role-point-detail {
+      border-radius: 2px;
+      cursor: help;
+      text-decoration-line: underline;
+      text-decoration-style: dotted;
+      text-decoration-color: rgba(17, 100, 102, 0.3);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      transition: color 160ms ease, background-color 160ms ease;
+    }
+
+    .role-point-detail:hover,
+    .role-point-detail:focus-visible {
+      color: var(--teal);
+      background: rgba(17, 100, 102, 0.055);
+      outline: none;
+    }
+
+    body.is-editing .role-point-detail {
+      color: inherit;
+      background: transparent;
+      text-decoration: none;
+      cursor: text;
+    }
+
     .stack-line {
       display: flex;
       gap: 9px;
@@ -723,6 +765,7 @@
       display: grid;
       width: 44px;
       height: 44px;
+      color: var(--ink);
       place-items: center;
       background: #fff;
       border-radius: 4px;
@@ -763,6 +806,27 @@
       color: rgba(255, 255, 255, 0.78);
       font-size: 11px;
       line-height: 1.55;
+    }
+
+    .tooltip-details {
+      display: grid;
+      gap: 10px;
+      margin-top: 13px;
+    }
+
+    .tooltip-detail {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .tooltip-detail strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--paper);
+      font-size: 9px;
+      text-transform: uppercase;
     }
 
     .sidebar {
@@ -1222,6 +1286,7 @@
       .app-bar,
       .editor-toolbar,
       .evidence-bar,
+      .interaction-tip,
       .skip-link {
         display: none !important;
       }
@@ -1405,6 +1470,13 @@
         background: transparent !important;
       }
 
+      .role-point-detail {
+        color: inherit !important;
+        background: transparent !important;
+        text-decoration: none !important;
+        outline: none !important;
+      }
+
       .stack-line .tech-token {
         color: inherit !important;
         border-bottom: 0 !important;
@@ -1561,6 +1633,8 @@
         <p class="summary editable" data-edit-id="profile-summary">Senior software engineer and engineering lead with 14+ years of experience building, modernizing, and operating high-scale platforms across cloud, data, and financial services. Combines hands-on architecture with pragmatic delivery leadership, turning complex migrations and reliability challenges into measurable outcomes. Deep experience across AWS, distributed systems, observability, and engineering mentorship.</p>
       </div>
     </section>
+
+    <p class="interaction-tip" data-interface><i data-lucide="mouse-pointer-click" aria-hidden="true"></i>Hover over each highlighted item for detailed info. Tap on mobile.</p>
 
     <div class="content-grid">
       <section class="experience reveal" aria-labelledby="experience-heading" style="--delay: 220ms">
@@ -1800,6 +1874,10 @@
       </div>
     </div>
     <p class="tooltip-description" id="tooltip-description"></p>
+    <div class="tooltip-details" id="tooltip-details" hidden>
+      <p class="tooltip-detail"><strong>Work involved</strong><span id="tooltip-work"></span></p>
+      <p class="tooltip-detail"><strong>Business relevance</strong><span id="tooltip-impact"></span></p>
+    </div>
   </div>
 
   <script>
@@ -1820,6 +1898,172 @@
       const editables = [...document.querySelectorAll(".editable[data-edit-id]")];
       const defaults = Object.fromEntries(editables.map((node) => [node.dataset.editId, node.innerHTML]));
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const pointDetails = {
+        "atlassian-points": [
+          {
+            title: "Cross-cloud schema migration",
+            work: "Schema boundaries, data compatibility, migration sequencing, and rollout controls across AWS and Google Cloud.",
+            relevance: "Data integrity, service continuity, and lower migration rework and cutover risk."
+          },
+          {
+            title: "Self-healing delivery pipeline",
+            work: "Generated-code validation, failure classification, remediation steps, and CI/CD feedback loops.",
+            relevance: "Faster recovery from failed builds, less manual intervention, and more predictable delivery."
+          },
+          {
+            title: "Cloud-agnostic alerting",
+            work: "Portable alert definitions, signal normalization, routing, and operational ownership across cloud environments.",
+            relevance: "Consistent reliability controls during provider changes and fewer monitoring blind spots."
+          },
+          {
+            title: "Engineering quality coaching",
+            work: "Code review, documentation standards, feature-flag discipline, and practical delivery feedback.",
+            relevance: "Lower release risk and stronger engineering judgment distributed across the team."
+          }
+        ],
+        "aws-points": [
+          {
+            title: "Critical platform migration",
+            work: "Migration planning, workstream sequencing, technical decisions, team coordination, and operational handover for a critical messaging platform.",
+            relevance: "Modernization of a business-critical service with less legacy operational burden and delivery risk."
+          },
+          {
+            title: "Serverless processing pipeline",
+            work: "Event-driven orchestration, data-processing stages, observability, and deployment controls using Lambda and Step Functions.",
+            relevance: "Faster processing and greater production stability, supporting the stated 20% and 35% improvements."
+          },
+          {
+            title: "Requirements and priorities",
+            work: "Requirement discovery, technical specification, trade-off analysis, dependency mapping, and priority alignment.",
+            relevance: "Shared scope and fewer costly delivery loops caused by unclear decisions."
+          },
+          {
+            title: "Engineering mentorship",
+            work: "Design and code reviews, architecture guidance, engineering standards, and hands-on mentoring.",
+            relevance: "More consistent engineering quality and greater team autonomy."
+          },
+          {
+            title: "Performance and cost",
+            work: "Resource-utilization analysis, bottleneck identification, capacity tuning, and targeted optimization.",
+            relevance: "A practical balance between application performance and sustainable cloud spend."
+          }
+        ],
+        "westpac-points": [
+          {
+            title: "Trade-surveillance delivery",
+            work: "Program planning, technical direction, delivery governance, stakeholder coordination, and risk management for the Hadoop platform.",
+            relevance: "Stronger regulatory monitoring and protection of a major multi-year technology investment."
+          },
+          {
+            title: "Surveillance data pipeline",
+            work: "Distributed ingestion, normalization, and Spark and Hadoop processing design for institutional surveillance inputs.",
+            relevance: "Market data made usable for timely, consistent surveillance predictions."
+          },
+          {
+            title: "Team delivery leadership",
+            work: "Work planning, technical unblockers, review cadence, and milestone tracking across four developers.",
+            relevance: "Improved delivery predictability and stronger confidence in milestone commitments."
+          },
+          {
+            title: "Full-stack prioritization",
+            work: "Priority negotiation, frontend and backend coordination, technical trade-offs, and sequencing across React and Node.js.",
+            relevance: "Business urgency balanced with maintainable delivery and fewer disruptions from competing demands."
+          },
+          {
+            title: "Kafka service bus",
+            work: "Event-contract design, Kafka integration, service decoupling, and operational monitoring between Java backends.",
+            relevance: "Better service interoperability and fewer brittle point-to-point dependencies."
+          }
+        ],
+        "cba-points": [
+          {
+            title: "Infrastructure as code",
+            work: "Codified infrastructure, reviewable change workflows, environment consistency, and operational adoption for Hadoop.",
+            relevance: "Safer, repeatable, and more auditable platform change during a broader transformation."
+          },
+          {
+            title: "TeamCity containerization",
+            work: "Containerization, runtime dependency packaging, migration planning, and service-hosting cutover.",
+            relevance: "Greater portability and less maintenance tied to bare-metal infrastructure."
+          },
+          {
+            title: "Hadoop operations APIs",
+            work: "Service-orchestration endpoints, workflow automation, error handling, and integration with Hadoop operations.",
+            relevance: "Less manual operational effort and more repeatable platform workflows."
+          },
+          {
+            title: "Large-cluster reliability",
+            work: "Capacity management, monitoring, incident response, and reliability practices across a 500+ node estate.",
+            relevance: "Continuity for business-critical applications at the stated 99.99% uptime."
+          },
+          {
+            title: "Hadoop migration to AWS",
+            work: "Workload assessment, migration sequencing, cloud architecture, and cost-focused infrastructure decisions.",
+            relevance: "Lower infrastructure expenditure and a more flexible platform operating model."
+          }
+        ],
+        "nab-points": [
+          {
+            title: "Multi-region Elasticsearch",
+            work: "Multi-region topology, resilience design, search-cluster delivery, and operational readiness.",
+            relevance: "A resilient data platform and an architecture recognized through the CTO Innovation Award."
+          },
+          {
+            title: "Shared observability platform",
+            work: "Common metric definitions, platform rollout, dashboard and alert patterns, and onboarding across teams.",
+            relevance: "A consistent operational view for 50+ teams and less fragmented monitoring."
+          },
+          {
+            title: "Trading-platform integration",
+            work: "Requirements translation, platform integration, production coordination, and feedback with trading users.",
+            relevance: "Analytical strategies connected to dependable production workflows for institutional users."
+          },
+          {
+            title: "Real-time risk monitoring",
+            work: "Real-time data handling, monitoring logic, alerting, and controls aligned to regulatory needs.",
+            relevance: "Better risk visibility and stronger support for compliance oversight."
+          }
+        ],
+        "macquarie-points": [
+          {
+            title: "Settlement analytics",
+            work: "Data normalization, settlement-optimization logic, multi-stage processing, and validation across the stated 600 million records.",
+            relevance: "Fewer unnecessary settlements and support for the stated daily cost reduction."
+          },
+          {
+            title: "Client request triage",
+            work: "Request discovery, impact assessment, prioritization, and translation into actionable work for developers.",
+            relevance: "Engineering capacity directed toward the highest-value institutional client needs."
+          },
+          {
+            title: "IRESS release management",
+            work: "Test planning, release coordination, deployment controls, and stakeholder communication for IRESS updates.",
+            relevance: "Lower release disruption on a business-critical trading platform."
+          }
+        ],
+        "citi-points": [
+          {
+            title: "Revenue-system monitoring",
+            work: "Coverage design, alert tuning, service-health signals, and operational response paths across 50+ systems.",
+            relevance: "Earlier issue detection and lower risk of revenue-impacting disruption."
+          },
+          {
+            title: "Cross-team incident response",
+            work: "Triage, ownership coordination, communication, and recovery across front-, middle-, and back-office teams.",
+            relevance: "Faster service restoration and less business impact from platform incidents."
+          },
+          {
+            title: "Stakeholder confidence",
+            work: "Service accountability, transparent communication, follow-through, and sustained improvement in support outcomes.",
+            relevance: "Stronger trust in the FICC support function and a better business-technology partnership."
+          },
+          {
+            title: "Trading-algorithm support",
+            work: "Production support, market-data and platform coordination, issue diagnosis, and user support for trading workflows.",
+            relevance: "Continuity for time-sensitive institutional market activity and productive trading users."
+          }
+        ]
+      };
       let isEditing = false;
       let activeSkill;
       let matchingRoles = [];
@@ -1905,6 +2149,7 @@
         if (!isEditing) {
           enhanceTechStacks();
           enhanceCapabilities();
+          enhanceRolePoints();
           indexRoleEvidence();
           save(false);
         }
@@ -2005,6 +2250,7 @@
 
       async function wordDocumentHtml() {
         const resume = document.querySelector("#resume").cloneNode(true);
+        resume.querySelector(".interaction-tip")?.remove();
         resume.querySelector(".quick-career-summary")?.remove();
         const projectVisuals = [...resume.querySelectorAll(".project-visual")];
         await Promise.all(projectVisuals.map(async (visual) => {
@@ -2270,6 +2516,27 @@
         });
       }
 
+      function enhanceRolePoints() {
+        document.querySelectorAll(".role-points[data-edit-id]").forEach((list) => {
+          const details = pointDetails[list.dataset.editId] || [];
+          [...list.children].forEach((item, index) => {
+            const hasDetails = Boolean(details[index]);
+            item.classList.toggle("role-point-detail", hasDetails);
+            if (hasDetails) {
+              item.dataset.detailGroup = list.dataset.editId;
+              item.dataset.detailIndex = String(index);
+              item.tabIndex = 0;
+              item.setAttribute("aria-describedby", "tech-tooltip");
+            } else {
+              delete item.dataset.detailGroup;
+              delete item.dataset.detailIndex;
+              item.removeAttribute("tabindex");
+              item.removeAttribute("aria-describedby");
+            }
+          });
+        });
+      }
+
       function indexRoleEvidence() {
         const categoryEvidence = {
           atlassian: ["languages", "cloudarchitecture", "sredevops", "leadership", "technicalstrategy", "teamcoaching", "codeanddesignreview", "distributedplatforms"],
@@ -2359,6 +2626,10 @@
         const tooltipCategory = document.querySelector("#tooltip-category");
         const tooltipName = document.querySelector("#tooltip-name");
         const tooltipDescription = document.querySelector("#tooltip-description");
+        const tooltipDetails = document.querySelector("#tooltip-details");
+        const tooltipWork = document.querySelector("#tooltip-work");
+        const tooltipImpact = document.querySelector("#tooltip-impact");
+        const tooltipSelector = ".role-point-detail, .tech-token, .capability-token, .capability-heading, .company-name-row[data-company]";
         const logo = (name, category, description, icon, color, fallback) => ({ name, category, description, icon, color, fallback });
         const glyph = (name, category, description, lucide, color, fallback) => ({ name, category, description, lucide, color, fallback });
         const awsLogo = "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg";
@@ -2448,6 +2719,7 @@
           citi: logo("Citibank", "Global bank", "Part of Citi, one of the world's largest banking groups, with institutional and consumer operations spanning nearly 180 countries and jurisdictions.", "https://www.google.com/s2/favicons?domain_url=https://www.citi.com&sz=128", "#116466", "CITI")
         };
         let activeTarget;
+        let tooltipPinned = false;
 
         function renderIcon(technology) {
           tooltipIcon.replaceChildren();
@@ -2525,13 +2797,18 @@
           tooltip.style.top = `${Math.min(top, window.innerHeight - tooltipBox.height - edge)}px`;
         }
 
-        function showTooltip(target) {
+        function showTooltip(target, pin = false) {
           if (isEditing) return;
-          const technology = target.matches(".company-name-row[data-company]")
-            ? companies[target.dataset.company]
-            : target.matches(".capability-heading[data-capability]")
-              ? capabilities[target.dataset.capability]
-              : technologies[target.dataset.tech] || glyph(
+          const pointDetail = target.matches(".role-point-detail")
+            ? pointDetails[target.dataset.detailGroup]?.[Number(target.dataset.detailIndex)]
+            : undefined;
+          const technology = pointDetail
+            ? glyph(pointDetail.title, "Experience context", "", "briefcase-business", "#d65f43", "EXP")
+            : target.matches(".company-name-row[data-company]")
+              ? companies[target.dataset.company]
+              : target.matches(".capability-heading[data-capability]")
+                ? capabilities[target.dataset.capability]
+                : technologies[target.dataset.tech] || glyph(
               target.textContent.trim(),
               "Technology",
               "A technology used to build, deliver, or operate the platform in this role.",
@@ -2541,56 +2818,69 @@
             );
           if (!technology) return;
           activeTarget = target;
+          tooltipPinned = pin;
           tooltip.style.setProperty("--tooltip-accent", technology.color);
           tooltipCategory.textContent = technology.category;
           tooltipName.textContent = technology.name;
           tooltipDescription.textContent = technology.description;
+          tooltipDescription.hidden = Boolean(pointDetail);
+          tooltipDetails.hidden = !pointDetail;
+          tooltipWork.textContent = pointDetail?.work || "";
+          tooltipImpact.textContent = pointDetail?.relevance || "";
           renderIcon(technology);
           tooltip.hidden = false;
           positionTooltip(target);
           animateTooltip();
         }
 
-        function hideTooltip(target) {
+        function hideTooltip(target, force = false) {
           if (target && activeTarget !== target) return;
+          if (tooltipPinned && !force) return;
           tooltip.hidden = true;
           activeTarget = undefined;
+          tooltipPinned = false;
         }
 
         document.addEventListener("mouseover", (event) => {
-          const target = event.target.closest?.(".tech-token, .capability-token, .capability-heading, .company-name-row[data-company]");
+          const target = event.target.closest?.(tooltipSelector);
           if (target && !target.contains(event.relatedTarget)) showTooltip(target);
         });
         document.addEventListener("mouseout", (event) => {
-          const target = event.target.closest?.(".tech-token, .capability-token, .capability-heading, .company-name-row[data-company]");
+          const target = event.target.closest?.(tooltipSelector);
           if (target && !target.contains(event.relatedTarget)) hideTooltip(target);
         });
         document.addEventListener("focusin", (event) => {
-          const target = event.target.closest?.(".tech-token, .capability-token, .capability-heading, .company-name-row[data-company]");
+          const target = event.target.closest?.(tooltipSelector);
           if (target) showTooltip(target);
         });
         document.addEventListener("focusout", (event) => {
-          const target = event.target.closest?.(".tech-token, .capability-token, .capability-heading, .company-name-row[data-company]");
+          const target = event.target.closest?.(tooltipSelector);
           if (target) hideTooltip(target);
         });
         document.addEventListener("click", (event) => {
-          const target = event.target.closest?.(".tech-token, .capability-token, .capability-heading, .company-name-row[data-company]");
+          const target = event.target.closest?.(tooltipSelector);
           if (target) {
-            if (!isEditing) showTooltip(target);
+            if (!isEditing && target.matches(".role-point-detail")) {
+              if (tooltipPinned && activeTarget === target) hideTooltip(undefined, true);
+              else showTooltip(target, true);
+            } else if (!isEditing) {
+              showTooltip(target);
+            }
             return;
           }
-          hideTooltip();
+          hideTooltip(undefined, true);
         });
         document.addEventListener("keydown", (event) => {
-          if (event.key === "Escape") hideTooltip();
+          if (event.key === "Escape") hideTooltip(undefined, true);
         });
         window.addEventListener("scroll", () => hideTooltip(), { passive: true });
-        window.addEventListener("resize", () => hideTooltip());
+        window.addEventListener("resize", () => hideTooltip(undefined, true));
       }
 
         hydrate();
         enhanceTechStacks();
         enhanceCapabilities();
+        enhanceRolePoints();
         indexRoleEvidence();
       renderProjectVisuals();
       initializeTechTooltips();
@@ -2611,6 +2901,7 @@
         });
         enhanceTechStacks();
         enhanceCapabilities();
+        enhanceRolePoints();
         indexRoleEvidence();
         clearSkillEvidence();
         localStorage.removeItem(STORAGE_KEY);
