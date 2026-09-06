@@ -89,7 +89,7 @@
       z-index: 20;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 14px;
       min-height: 58px;
       padding: 8px 22px;
       color: var(--ink);
@@ -107,6 +107,7 @@
 
     .app-brand {
       gap: 10px;
+      margin-right: auto;
       font-size: 13px;
       font-weight: 700;
     }
@@ -119,6 +120,49 @@
 
     .app-actions {
       gap: 6px;
+    }
+
+    .view-switcher {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 2px;
+      padding: 3px;
+      background: var(--quiet);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .view-option {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 28px;
+      padding: 4px 9px;
+      color: var(--soft-ink);
+      font-size: 11px;
+      font-weight: 700;
+      background: transparent;
+      border: 0;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .view-option:hover,
+    .view-option:focus-visible {
+      color: var(--ink);
+      outline: 1px solid var(--line);
+    }
+
+    .view-option[aria-pressed="true"] {
+      color: var(--paper);
+      background: var(--ink);
+      outline: 0;
+    }
+
+    .view-option:disabled {
+      cursor: default;
+      opacity: 0.45;
     }
 
     .control,
@@ -162,7 +206,8 @@
     }
 
     .control svg,
-    .tool-button svg {
+    .tool-button svg,
+    .view-option svg {
       width: 16px;
       height: 16px;
       stroke-width: 1.8;
@@ -180,6 +225,79 @@
       padding: 6px 16px;
       background: var(--ink);
       box-shadow: 0 8px 24px rgba(24, 33, 31, 0.16);
+    }
+
+    .evidence-bar {
+      position: sticky;
+      top: 58px;
+      z-index: 18;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-height: 42px;
+      padding: 5px 16px;
+      color: var(--ink);
+      background: rgba(245, 247, 245, 0.97);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 8px 20px rgba(24, 33, 31, 0.08);
+      backdrop-filter: blur(14px);
+    }
+
+    .evidence-label {
+      min-width: 0;
+      margin: 0;
+      font-size: 12px;
+    }
+
+    .evidence-label strong {
+      color: var(--teal);
+    }
+
+    .evidence-actions {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .evidence-position {
+      min-width: 34px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .evidence-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      min-height: 30px;
+      padding: 0;
+      color: var(--ink);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .evidence-button:hover,
+    .evidence-button:focus-visible {
+      background: var(--paper);
+      border-color: var(--line);
+      outline: none;
+    }
+
+    .evidence-button:disabled {
+      cursor: default;
+      opacity: 0.35;
+    }
+
+    .evidence-button svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2;
     }
 
     .tool-group {
@@ -358,6 +476,7 @@
       position: relative;
       padding: 0 0 32px 24px;
       break-inside: avoid;
+      transition: opacity 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
     }
 
     .role:last-child {
@@ -389,6 +508,64 @@
 
     .role:last-child::after {
       display: none;
+    }
+
+    .quick-career-summary {
+      display: none;
+      margin: 3px 0 0 24px;
+      padding: 12px 14px;
+      color: var(--soft-ink);
+      font-size: 11px;
+      line-height: 1.5;
+      background: var(--quiet);
+      border-left: 3px solid var(--gold);
+    }
+
+    .quick-career-summary strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--ink);
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    body.is-quick-scan .role-points li:nth-child(n+3),
+    body.is-quick-scan .role:nth-of-type(n+5) {
+      display: none;
+    }
+
+    body.is-quick-scan .role:nth-of-type(4) {
+      padding-bottom: 0;
+    }
+
+    body.is-quick-scan .role:nth-of-type(4)::after {
+      display: none;
+    }
+
+    body.is-quick-scan .quick-career-summary {
+      display: block;
+    }
+
+    body.is-quick-scan.is-skill-focused .role.is-skill-match {
+      display: block;
+    }
+
+    body.is-quick-scan.is-skill-focused .quick-career-summary {
+      display: none;
+    }
+
+    body.is-skill-focused .role {
+      opacity: 0.24;
+    }
+
+    body.is-skill-focused .role.is-skill-match {
+      opacity: 1;
+      background: linear-gradient(90deg, rgba(17, 100, 102, 0.08), transparent 76%);
+      border-radius: 4px;
+    }
+
+    body.is-skill-focused .role.is-current-match {
+      box-shadow: inset 3px 0 var(--coral);
     }
 
     .role-header {
@@ -495,6 +672,22 @@
       color: var(--coral);
       outline: none;
       transform: translateY(-1px);
+    }
+
+    .tech-token.has-evidence,
+    .capability-token.has-evidence,
+    .capability-heading.has-evidence {
+      cursor: pointer;
+      text-decoration-color: rgba(214, 95, 67, 0.65);
+    }
+
+    .tech-token.is-skill-selected,
+    .capability-token.is-skill-selected,
+    .capability-heading.is-skill-selected {
+      color: var(--coral);
+      text-decoration-color: currentColor;
+      text-decoration-style: solid;
+      box-shadow: 0 2px 0 rgba(214, 95, 67, 0.24);
     }
 
     body.is-editing .tech-token {
@@ -836,6 +1029,10 @@
       .project-card {
         transition: none;
       }
+
+      .role {
+        transition: none;
+      }
     }
 
     @media (max-width: 860px) {
@@ -887,7 +1084,8 @@
       }
 
       .app-brand span:last-child,
-      .control .button-label {
+      .control .button-label,
+      .view-option .button-label {
         position: absolute;
         width: 1px;
         height: 1px;
@@ -903,11 +1101,29 @@
         padding: 0;
       }
 
+      .view-option {
+        width: 30px;
+        padding: 0;
+      }
+
       .editor-toolbar {
         top: 54px;
         justify-content: space-between;
         gap: 3px;
         padding: 6px 8px;
+      }
+
+      .evidence-bar {
+        top: 54px;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 5px 10px;
+      }
+
+      .evidence-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .save-state {
@@ -1005,8 +1221,37 @@
 
       .app-bar,
       .editor-toolbar,
+      .evidence-bar,
       .skip-link {
         display: none !important;
+      }
+
+      body.is-quick-scan .role-points li,
+      body.is-quick-scan .role {
+        display: list-item !important;
+      }
+
+      body.is-quick-scan .role {
+        display: block !important;
+      }
+
+      body.is-quick-scan .role:nth-of-type(4) {
+        padding-bottom: 3mm;
+      }
+
+      body.is-quick-scan .role:nth-of-type(4)::after {
+        display: block;
+      }
+
+      .quick-career-summary {
+        display: none !important;
+      }
+
+      body.is-skill-focused .role,
+      body.is-skill-focused .role.is-skill-match {
+        opacity: 1 !important;
+        background: transparent !important;
+        box-shadow: none !important;
       }
 
       .resume {
@@ -1203,6 +1448,16 @@
       <span class="app-mark" aria-hidden="true"></span>
       <span>Will Chen / Resume</span>
     </div>
+    <div class="view-switcher" role="group" aria-label="Resume view">
+      <button class="view-option" type="button" data-view="quick" aria-pressed="false" title="Quick scan">
+        <i data-lucide="scan-line" aria-hidden="true"></i>
+        <span class="button-label">Quick scan</span>
+      </button>
+      <button class="view-option" type="button" data-view="full" aria-pressed="true" title="Full resume">
+        <i data-lucide="align-justify" aria-hidden="true"></i>
+        <span class="button-label">Full resume</span>
+      </button>
+    </div>
     <nav class="app-actions" aria-label="Resume actions">
       <button class="control primary" id="edit-toggle" type="button" aria-pressed="false" title="Toggle editing">
         <i data-lucide="pencil" aria-hidden="true"></i>
@@ -1230,6 +1485,22 @@
       </button>
     </nav>
   </header>
+
+  <div class="evidence-bar" id="evidence-bar" hidden data-interface>
+    <p class="evidence-label" aria-live="polite"><strong id="evidence-skill"></strong> <span id="evidence-count"></span></p>
+    <div class="evidence-actions">
+      <button class="evidence-button" id="evidence-previous" type="button" aria-label="Previous matching role" title="Previous matching role">
+        <i data-lucide="chevron-up" aria-hidden="true"></i>
+      </button>
+      <span class="evidence-position" id="evidence-position" aria-hidden="true"></span>
+      <button class="evidence-button" id="evidence-next" type="button" aria-label="Next matching role" title="Next matching role">
+        <i data-lucide="chevron-down" aria-hidden="true"></i>
+      </button>
+      <button class="evidence-button" id="evidence-clear" type="button" aria-label="Clear skill focus" title="Clear skill focus">
+        <i data-lucide="x" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
 
   <div class="editor-toolbar" id="editor-toolbar" role="toolbar" aria-label="Text formatting" hidden data-interface>
     <div class="tool-group">
@@ -1432,6 +1703,8 @@
           </ul>
           <div class="stack-line"><strong>Tech Stack</strong><span class="editable tech-items" data-edit-id="citi-stack">IRESS &middot; Reuters &middot; Bloomberg &middot; ION MarketView &middot; Yieldbroker &middot; kdb+ &middot; Python &middot; C#</span></div>
         </article>
+
+        <p class="quick-career-summary"><strong>Earlier career</strong>National Australia Bank &middot; Macquarie Bank &middot; Citibank &middot; 2012&ndash;2018</p>
       </section>
 
       <aside class="sidebar reveal" aria-label="Skills, education, and recognition" style="--delay: 280ms">
@@ -1536,11 +1809,21 @@
       const editToggle = document.querySelector("#edit-toggle");
       const editLabel = editToggle.querySelector(".button-label");
       const toolbar = document.querySelector("#editor-toolbar");
+      const viewButtons = [...document.querySelectorAll("[data-view]")];
+      const evidenceBar = document.querySelector("#evidence-bar");
+      const evidenceSkill = document.querySelector("#evidence-skill");
+      const evidenceCount = document.querySelector("#evidence-count");
+      const evidencePosition = document.querySelector("#evidence-position");
+      const evidencePrevious = document.querySelector("#evidence-previous");
+      const evidenceNext = document.querySelector("#evidence-next");
       const saveState = document.querySelector("#save-state");
       const editables = [...document.querySelectorAll(".editable[data-edit-id]")];
       const defaults = Object.fromEntries(editables.map((node) => [node.dataset.editId, node.innerHTML]));
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       let isEditing = false;
+      let activeSkill;
+      let matchingRoles = [];
+      let activeMatchIndex = 0;
       let saveTimer;
       let savedRange;
 
@@ -1585,17 +1868,44 @@
         saveTimer = window.setTimeout(() => save(false), 500);
       }
 
+      function setViewMode(mode) {
+        const isQuickScan = mode === "quick";
+        body.classList.toggle("is-quick-scan", isQuickScan);
+        viewButtons.forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.view === mode));
+        });
+      }
+
+      function clearSkillEvidence() {
+        activeSkill = undefined;
+        matchingRoles = [];
+        activeMatchIndex = 0;
+        body.classList.remove("is-skill-focused");
+        document.querySelectorAll(".is-skill-match, .is-current-match, .is-skill-selected").forEach((node) => {
+          node.classList.remove("is-skill-match", "is-current-match", "is-skill-selected");
+        });
+        evidenceBar.hidden = true;
+      }
+
       function setEditing(nextState) {
         isEditing = nextState;
+        if (isEditing) {
+          setViewMode("full");
+          clearSkillEvidence();
+        }
         body.classList.toggle("is-editing", isEditing);
         toolbar.hidden = !isEditing;
         editToggle.setAttribute("aria-pressed", String(isEditing));
         editLabel.textContent = isEditing ? "Done" : "Edit";
+        viewButtons.forEach((button) => {
+          button.disabled = isEditing;
+        });
         editables.forEach((node) => node.setAttribute("contenteditable", String(isEditing)));
         setStatus(isEditing ? "Editing" : "Saved");
         if (!isEditing) {
           enhanceTechStacks();
           enhanceCapabilities();
+          indexRoleEvidence();
           save(false);
         }
       }
@@ -1639,10 +1949,18 @@
         save(false);
         const snapshot = document.documentElement.cloneNode(true);
         const snapshotBody = snapshot.querySelector("body");
-        snapshotBody.classList.remove("is-editing");
+        snapshotBody.classList.remove("is-editing", "is-quick-scan", "is-skill-focused");
+        snapshot.querySelectorAll("[data-view]").forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.view === "full"));
+          button.removeAttribute("disabled");
+        });
         snapshot.querySelector("#editor-toolbar").setAttribute("hidden", "");
+        snapshot.querySelector("#evidence-bar").setAttribute("hidden", "");
         snapshot.querySelector("#tech-tooltip").setAttribute("hidden", "");
         snapshot.querySelector("#tech-tooltip").removeAttribute("style");
+        snapshot.querySelectorAll(".is-skill-match, .is-current-match, .is-skill-selected").forEach((node) => {
+          node.classList.remove("is-skill-match", "is-current-match", "is-skill-selected");
+        });
         snapshot.querySelectorAll("[contenteditable]").forEach((node) => node.setAttribute("contenteditable", "false"));
         snapshot.querySelector("#edit-toggle").setAttribute("aria-pressed", "false");
         const blob = new Blob(["<!doctype html>\n" + snapshot.outerHTML], { type: "text/html;charset=utf-8" });
@@ -1687,6 +2005,7 @@
 
       async function wordDocumentHtml() {
         const resume = document.querySelector("#resume").cloneNode(true);
+        resume.querySelector(".quick-career-summary")?.remove();
         const projectVisuals = [...resume.querySelectorAll(".project-visual")];
         await Promise.all(projectVisuals.map(async (visual) => {
           const svg = visual.querySelector("svg");
@@ -1951,6 +2270,89 @@
         });
       }
 
+      function indexRoleEvidence() {
+        const categoryEvidence = {
+          atlassian: ["languages", "cloudarchitecture", "sredevops", "leadership", "technicalstrategy", "teamcoaching", "codeanddesignreview", "distributedplatforms"],
+          aws: ["languages", "cloudarchitecture", "sredevops", "dataplatforms", "leadership", "serverlesssystems", "distributedplatforms", "apidesign", "infrastructureascode", "incidentreduction", "dataengineering", "technicalstrategy", "teamcoaching", "deliveryplanning", "stakeholdermanagement", "codeanddesignreview"],
+          westpac: ["languages", "dataplatforms", "leadership", "markets", "javascript", "dataengineering", "distributedplatforms", "apidesign", "teamcoaching", "deliveryplanning", "stakeholdermanagement", "fixedincome", "fx", "institutionalmarkets"],
+          commonwealth: ["languages", "cloudarchitecture", "sredevops", "dataplatforms", "leadership", "docker", "infrastructureascode", "incidentreduction", "dataengineering", "distributedplatforms"],
+          nab: ["languages", "sredevops", "dataplatforms", "leadership", "markets", "incidentreduction", "institutionalmarkets", "technicalstrategy", "stakeholdermanagement"],
+          macquarie: ["languages", "dataplatforms", "markets", "dataengineering", "deliveryplanning", "stakeholdermanagement", "institutionalmarkets"],
+          citi: ["languages", "sredevops", "markets", "incidentreduction", "fixedincome", "institutionalmarkets", "stakeholdermanagement"]
+        };
+        const roles = [...document.querySelectorAll(".role")];
+        roles.forEach((role) => {
+          const companyKey = role.querySelector("[data-company]")?.dataset.company;
+          const technologyKeys = [...role.querySelectorAll(".tech-token[data-tech]")].map((token) => token.dataset.tech);
+          role.dataset.evidence = [...new Set([...technologyKeys, companyKey, ...(categoryEvidence[companyKey] || [])].filter(Boolean))].join(" ");
+        });
+        document.querySelectorAll(".tech-token[data-tech], .capability-token[data-tech], .capability-heading[data-capability]").forEach((target) => {
+          const key = target.dataset.tech || target.dataset.capability;
+          const count = roles.filter((role) => role.dataset.evidence.split(" ").includes(key)).length;
+          target.classList.toggle("has-evidence", count > 0);
+          if (count > 0) target.dataset.evidenceCount = String(count);
+          else delete target.dataset.evidenceCount;
+        });
+      }
+
+      function updateEvidenceNavigation() {
+        matchingRoles.forEach((role, index) => role.classList.toggle("is-current-match", index === activeMatchIndex));
+        evidencePosition.textContent = `${activeMatchIndex + 1}/${matchingRoles.length}`;
+        evidencePrevious.disabled = matchingRoles.length < 2;
+        evidenceNext.disabled = matchingRoles.length < 2;
+      }
+
+      function focusEvidenceMatch(index) {
+        if (!matchingRoles.length) return;
+        activeMatchIndex = (index + matchingRoles.length) % matchingRoles.length;
+        updateEvidenceNavigation();
+        matchingRoles[activeMatchIndex].scrollIntoView({
+          behavior: reducedMotion ? "auto" : "smooth",
+          block: "center"
+        });
+      }
+
+      function showSkillEvidence(target) {
+        const key = target.dataset.tech || target.dataset.capability;
+        if (!key || !target.classList.contains("has-evidence")) return;
+        if (activeSkill === key) {
+          clearSkillEvidence();
+          return;
+        }
+        activeSkill = key;
+        matchingRoles = [...document.querySelectorAll(".role")].filter((role) => role.dataset.evidence.split(" ").includes(key));
+        activeMatchIndex = 0;
+        body.classList.add("is-skill-focused");
+        document.querySelectorAll(".role").forEach((role) => role.classList.toggle("is-skill-match", matchingRoles.includes(role)));
+        document.querySelectorAll(".tech-token[data-tech], .capability-token[data-tech], .capability-heading[data-capability]").forEach((node) => {
+          node.classList.toggle("is-skill-selected", (node.dataset.tech || node.dataset.capability) === key);
+        });
+        evidenceSkill.textContent = target.textContent.trim();
+        evidenceCount.textContent = `· ${matchingRoles.length} matching ${matchingRoles.length === 1 ? "role" : "roles"}`;
+        evidenceBar.hidden = false;
+        focusEvidenceMatch(0);
+      }
+
+      function initializeSkillEvidence() {
+        const evidenceSelector = ".tech-token.has-evidence, .capability-token.has-evidence, .capability-heading.has-evidence";
+        document.addEventListener("click", (event) => {
+          const target = event.target.closest?.(evidenceSelector);
+          if (target && !isEditing) showSkillEvidence(target);
+        });
+        document.addEventListener("keydown", (event) => {
+          const target = event.target.closest?.(evidenceSelector);
+          if (target && !isEditing && (event.key === "Enter" || event.key === " ")) {
+            event.preventDefault();
+            showSkillEvidence(target);
+          } else if (event.key === "Escape" && activeSkill) {
+            clearSkillEvidence();
+          }
+        });
+        evidencePrevious.addEventListener("click", () => focusEvidenceMatch(activeMatchIndex - 1));
+        evidenceNext.addEventListener("click", () => focusEvidenceMatch(activeMatchIndex + 1));
+        document.querySelector("#evidence-clear").addEventListener("click", clearSkillEvidence);
+      }
+
       function initializeTechTooltips() {
         const tooltip = document.querySelector("#tech-tooltip");
         const tooltipIcon = document.querySelector("#tooltip-icon");
@@ -2189,9 +2591,14 @@
         hydrate();
         enhanceTechStacks();
         enhanceCapabilities();
+        indexRoleEvidence();
       renderProjectVisuals();
       initializeTechTooltips();
+      initializeSkillEvidence();
 
+      viewButtons.forEach((button) => {
+        button.addEventListener("click", () => setViewMode(button.dataset.view));
+      });
       editToggle.addEventListener("click", () => setEditing(!isEditing));
       document.querySelector("#save-button").addEventListener("click", () => save(true));
       document.querySelector("#download-button").addEventListener("click", downloadHtml);
@@ -2204,6 +2611,8 @@
         });
         enhanceTechStacks();
         enhanceCapabilities();
+        indexRoleEvidence();
+        clearSkillEvidence();
         localStorage.removeItem(STORAGE_KEY);
         setStatus("Original restored");
       });
