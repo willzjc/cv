@@ -1510,6 +1510,116 @@
       }
     }
   </style>
+  <style id="screen-intro-styles">
+    @media screen {
+      .reveal,
+      body.is-ready .reveal {
+        opacity: 1;
+        transform: none;
+        animation: none;
+      }
+
+      .opening-intro {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background:
+          linear-gradient(rgba(24, 33, 31, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(24, 33, 31, 0.025) 1px, transparent 1px),
+          var(--quiet);
+        background-size: 40px 40px;
+        pointer-events: none;
+      }
+
+      .opening-copy {
+        width: min(100%, 640px);
+        text-align: center;
+      }
+
+      .opening-mark {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        margin-bottom: 24px;
+      }
+
+      .opening-mark span {
+        width: 30px;
+        height: 3px;
+        background: var(--teal);
+        transform-origin: right;
+      }
+
+      .opening-mark span + span {
+        background: var(--coral);
+        transform-origin: left;
+      }
+
+      .opening-name {
+        margin: 0;
+        font-family: "Instrument Serif", Georgia, serif;
+        font-size: 72px;
+        line-height: 1.15;
+        overflow-wrap: anywhere;
+      }
+
+      .opening-role {
+        max-width: 400px;
+        margin: 14px auto 0;
+        color: var(--soft-ink);
+        font-size: 14px;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+      }
+
+      .opening-intro.is-playing {
+        animation: opening-exit 1600ms ease both;
+      }
+
+      .opening-intro.is-playing .opening-mark span {
+        animation: opening-line 500ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      }
+
+      .opening-intro.is-playing .opening-name {
+        animation: opening-reveal 650ms cubic-bezier(0.2, 0.7, 0.2, 1) 100ms both;
+      }
+
+      .opening-intro.is-playing .opening-role {
+        animation: opening-reveal 500ms cubic-bezier(0.2, 0.7, 0.2, 1) 280ms both;
+      }
+
+      @keyframes opening-line {
+        from { transform: scaleX(0); }
+        to { transform: scaleX(1); }
+      }
+
+      @keyframes opening-reveal {
+        from { opacity: 0; transform: translateY(18px); clip-path: inset(0 0 100% 0); }
+        to { opacity: 1; transform: translateY(0); clip-path: inset(0); }
+      }
+
+      @keyframes opening-exit {
+        0%, 70% { opacity: 1; }
+        100% { opacity: 0; visibility: hidden; }
+      }
+    }
+
+    @media screen and (max-width: 620px) {
+      .opening-name { font-size: 48px; }
+      .opening-role { font-size: 12px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .opening-intro { display: none !important; }
+    }
+
+    @media print {
+      [data-screen-only] { display: none !important; }
+    }
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#resume">Skip to resume</a>
@@ -1608,6 +1718,14 @@
       </button>
     </div>
     <span class="save-state" id="save-state" role="status" aria-live="polite">Ready to edit</span>
+  </div>
+
+  <div class="opening-intro" id="opening-intro" aria-hidden="true" hidden data-screen-only data-interface>
+    <div class="opening-copy">
+      <span class="opening-mark"><span></span><span></span></span>
+      <p class="opening-name" id="opening-name">Will Chen</p>
+      <p class="opening-role" id="opening-role">Senior Software Engineer &amp; Engineering Lead</p>
+    </div>
   </div>
 
   <main class="resume" id="resume">
@@ -1811,8 +1929,8 @@
         </section>
 
         <section class="sidebar-section">
-          <h2 class="sidebar-label editable" data-edit-id="methods-heading">Ways of working</h2>
-          <p class="principles editable" data-edit-id="methods-copy">Clear decisions. Observable systems. Small, reversible changes. Teams that understand why.</p>
+          <h2 class="sidebar-label editable" data-edit-id="methods-heading">Technical leadership</h2>
+          <p class="principles editable" data-edit-id="methods-copy">Set technical direction across teams, align architecture with business priorities, and make reliability, cost, and delivery trade-offs explicit. Establish shared engineering standards and mentor engineers to lead complex designs and take ownership of production systems.</p>
         </section>
       </aside>
     </div>
@@ -2082,9 +2200,14 @@
         try {
           const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
           if (!saved || typeof saved !== "object") return;
+          const previousDefaults = {
+            "methods-heading": "Ways of working",
+            "methods-copy": "Clear decisions. Observable systems. Small, reversible changes. Teams that understand why."
+          };
           editables.forEach((node) => {
-            if (typeof saved[node.dataset.editId] === "string") {
-              node.innerHTML = saved[node.dataset.editId];
+            const editId = node.dataset.editId;
+            if (typeof saved[editId] === "string" && saved[editId] !== previousDefaults[editId]) {
+              node.innerHTML = saved[editId];
             }
           });
         } catch (error) {
@@ -2207,6 +2330,9 @@
         });
         snapshot.querySelectorAll("[contenteditable]").forEach((node) => node.setAttribute("contenteditable", "false"));
         snapshot.querySelector("#edit-toggle").setAttribute("aria-pressed", "false");
+        const introSnapshot = snapshot.querySelector("#opening-intro");
+        introSnapshot.hidden = true;
+        introSnapshot.classList.remove("is-playing");
         const blob = new Blob(["<!doctype html>\n" + snapshot.outerHTML], { type: "text/html;charset=utf-8" });
         downloadBlob(blob, "will-chen-resume.html");
       }
@@ -2334,7 +2460,7 @@
         });
 
         children.push(
-          sectionHeading("Ways of working"),
+          sectionHeading(wordText(document.querySelector('[data-edit-id="methods-heading"]'))),
           new Paragraph({ children: [textRun(wordText(document.querySelector('[data-edit-id="methods-copy"]')))] }),
           sectionHeading("Personal projects")
         );
@@ -2945,6 +3071,61 @@
       window.addEventListener("beforeunload", () => save(false));
       if (window.lucide) window.lucide.createIcons();
       window.requestAnimationFrame(() => body.classList.add("is-ready"));
+    })();
+  </script>
+  <script id="screen-intro-script">
+    (() => {
+      const INTRO_KEY = "will-chen-intro-seen-v1";
+      const intro = document.querySelector("#opening-intro");
+      const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      function claimFirstVisit() {
+        for (const storageName of ["localStorage", "sessionStorage"]) {
+          try {
+            const storage = window[storageName];
+            if (storage.getItem(INTRO_KEY)) return false;
+            storage.setItem(INTRO_KEY, "1");
+            return true;
+          } catch {}
+        }
+        return false;
+      }
+
+      if (!claimFirstVisit() || motionQuery.matches || window.matchMedia("print").matches || window.location.hash) return;
+
+      intro.querySelector("#opening-name").textContent = document.querySelector('#resume [data-edit-id="name"]').textContent;
+      intro.querySelector("#opening-role").textContent = document.querySelector('#resume [data-edit-id="headline"]').textContent;
+
+      const dismissEvents = ["pointerdown", "touchstart", "click", "keydown", "wheel", "scroll", "focusin"];
+      let fallbackTimer;
+
+      function finishIntro() {
+        intro.hidden = true;
+        intro.classList.remove("is-playing");
+        window.clearTimeout(fallbackTimer);
+        dismissEvents.forEach((eventName) => document.removeEventListener(eventName, finishIntro, true));
+        window.removeEventListener("beforeprint", finishIntro);
+        window.removeEventListener("pagehide", finishIntro);
+        motionQuery.removeEventListener("change", onMotionChange);
+        intro.removeEventListener("animationend", onAnimationEnd);
+      }
+
+      function onMotionChange() {
+        if (motionQuery.matches) finishIntro();
+      }
+
+      function onAnimationEnd(event) {
+        if (event.target === intro && event.animationName === "opening-exit") finishIntro();
+      }
+
+      dismissEvents.forEach((eventName) => document.addEventListener(eventName, finishIntro, { capture: true, passive: true }));
+      window.addEventListener("beforeprint", finishIntro);
+      window.addEventListener("pagehide", finishIntro);
+      motionQuery.addEventListener("change", onMotionChange);
+      intro.addEventListener("animationend", onAnimationEnd);
+      intro.hidden = false;
+      intro.classList.add("is-playing");
+      fallbackTimer = window.setTimeout(finishIntro, 1800);
     })();
   </script>
 </body>
