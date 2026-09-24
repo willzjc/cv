@@ -1723,8 +1723,8 @@
   <div class="opening-intro" id="opening-intro" aria-hidden="true" hidden data-screen-only data-interface>
     <div class="opening-copy">
       <span class="opening-mark"><span></span><span></span></span>
-      <p class="opening-name" id="opening-name">Will Chen</p>
-      <p class="opening-role" id="opening-role">Senior Software Engineer &amp; Engineering Lead</p>
+      <p class="opening-name" id="opening-name"></p>
+      <p class="opening-role" id="opening-role"></p>
     </div>
   </div>
 
@@ -2201,6 +2201,7 @@
           const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
           if (!saved || typeof saved !== "object") return;
           const previousDefaults = {
+            "headline": "Senior Software Engineer & Engineering Lead",
             "methods-heading": "Ways of working",
             "methods-copy": "Clear decisions. Observable systems. Small, reversible changes. Teams that understand why."
           };
@@ -2382,23 +2383,31 @@
           border: { bottom: { color: line, style: BorderStyle.SINGLE, size: 4, space: 4 } },
           keepNext: true
         });
+        const name = wordText(document.querySelector('[data-edit-id="name"]'));
+        const headline = wordText(document.querySelector('[data-edit-id="headline"]'));
+        const contactRuns = [];
+        document.querySelectorAll('[data-edit-id="contact"] > *').forEach((item, index) => {
+          if (index > 0) contactRuns.push(mutedRun(" | ", { size: 18 }));
+          const text = wordText(item);
+          contactRuns.push(item instanceof HTMLAnchorElement
+            ? hyperlink(text, item.href)
+            : mutedRun(text, { size: 18 }));
+        });
+        const interactiveLink = document.querySelector(".interactive-note a");
         const children = [
-          new Paragraph({ children: [textRun(wordText(document.querySelector('[data-edit-id="name"]')), { bold: true, size: 44 })], spacing: { after: 20 } }),
-          new Paragraph({ children: [mutedRun(wordText(document.querySelector('[data-edit-id="headline"]')), { size: 24 })], spacing: { after: 70 } }),
+          new Paragraph({ children: [textRun(name, { bold: true, size: 44 })], spacing: { after: 20 } }),
+          new Paragraph({ children: [mutedRun(headline, { size: 24 })], spacing: { after: 70 } }),
           new Paragraph({
-            children: [
-              mutedRun("Sydney, Australia | +61 451 952 945 | ", { size: 18 }),
-              hyperlink("willzjc@gmail.com", "mailto:willzjc@gmail.com")
-            ],
+            children: contactRuns,
             spacing: { after: 50 }
           }),
           new Paragraph({
-            children: [mutedRun("Interactive version: ", { size: 18 }), hyperlink("https://willzjc.github.io/cv/", "https://willzjc.github.io/cv/")],
+            children: [mutedRun("Interactive version: ", { size: 18 }), hyperlink(wordText(interactiveLink), interactiveLink.href)],
             spacing: { after: 140 }
           }),
-          sectionHeading("Profile"),
+          sectionHeading(wordText(document.querySelector('[data-edit-id="profile-heading"]'))),
           new Paragraph({ children: [textRun(wordText(document.querySelector('[data-edit-id="profile-summary"]')))], spacing: { after: 120 } }),
-          sectionHeading("Experience")
+          sectionHeading(wordText(document.querySelector('[data-edit-id="experience-heading"]')))
         ];
 
         document.querySelectorAll(".role").forEach((role) => {
@@ -2426,13 +2435,13 @@
             }));
           });
           children.push(new Paragraph({
-            children: [textRun("Tech stack: ", { bold: true, size: 16 }), mutedRun(wordText(role.querySelector(".tech-items")), { size: 16 })],
+            children: [textRun(`${wordText(role.querySelector(".stack-line strong"))}: `, { bold: true, size: 16 }), mutedRun(wordText(role.querySelector(".tech-items")), { size: 16 })],
             spacing: { after: 80 },
             keepLines: true
           }));
         });
 
-        children.push(sectionHeading("Core capabilities"));
+        children.push(sectionHeading(wordText(document.querySelector('[data-edit-id="capabilities-heading"]'))));
         document.querySelectorAll(".capability-list > li").forEach((item) => {
           children.push(new Paragraph({
             children: [
@@ -2443,12 +2452,12 @@
           }));
         });
 
-        children.push(sectionHeading("Education"));
+        children.push(sectionHeading(wordText(document.querySelector('[data-edit-id="education-heading"]'))));
         const education = document.querySelector('[data-edit-id="education-copy"]');
         children.push(new Paragraph({ children: [textRun(wordText(education.querySelector("strong")), { bold: true })], spacing: { after: 30 } }));
         education.querySelectorAll("p").forEach((item) => children.push(new Paragraph({ children: [textRun(wordText(item))], spacing: { after: 45 } })));
 
-        children.push(sectionHeading("Recognition"));
+        children.push(sectionHeading(wordText(document.querySelector('[data-edit-id="awards-heading"]'))));
         document.querySelectorAll(".award-list > li").forEach((item) => {
           children.push(new Paragraph({
             children: [
@@ -2462,7 +2471,7 @@
         children.push(
           sectionHeading(wordText(document.querySelector('[data-edit-id="methods-heading"]'))),
           new Paragraph({ children: [textRun(wordText(document.querySelector('[data-edit-id="methods-copy"]')))] }),
-          sectionHeading("Personal projects")
+          sectionHeading(wordText(document.querySelector('[data-edit-id="projects-kicker"]')))
         );
         document.querySelectorAll(".project-card").forEach((project) => {
           children.push(new Paragraph({
@@ -2476,15 +2485,15 @@
           }));
         });
         children.push(new Paragraph({
-          children: [mutedRun("Will Chen | Sydney, Australia | willzjc@gmail.com", { size: 16 })],
+          children: [mutedRun(wordText(document.querySelector('[data-edit-id="footer-left"]')), { size: 16 })],
           spacing: { before: 220 },
           alignment: AlignmentType.CENTER
         }));
 
         const wordDocument = new Document({
-          creator: "Will Chen",
-          title: "Will Chen Resume",
-          description: "Will Chen - Senior Software Engineer and Engineering Lead",
+          creator: name,
+          title: `${name} Resume`,
+          description: `${name} - ${headline}`,
           numbering: {
             config: [{
               reference: bulletReference,

@@ -107,13 +107,20 @@ async function wordContent(blob) {
   const archive = unzipSync(new Uint8Array(await blob.arrayBuffer()));
   const dom = new JSDOM(strFromU8(archive["word/document.xml"]), { contentType: "text/xml" });
   const document = dom.window.document;
+  const coreDom = new JSDOM(strFromU8(archive["docProps/core.xml"]), { contentType: "text/xml" });
+  const core = coreDom.window.document;
   for (const hyperlink of document.getElementsByTagName("w:hyperlink")) hyperlink.setAttribute("r:id", "hyperlink");
   for (const numbering of document.getElementsByTagName("w:numId")) numbering.setAttribute("w:val", "list");
   const paragraphs = [...document.getElementsByTagName("w:p")].map((paragraph) =>
     [...paragraph.getElementsByTagName("w:t")].map((node) => node.textContent).join("")
   );
-  const result = { xml: document.documentElement.outerHTML, paragraphs };
+  const metadata = Object.fromEntries(["creator", "title", "description"].map((field) => [
+    field,
+    core.getElementsByTagName(`dc:${field}`)[0]?.textContent
+  ]));
+  const result = { xml: document.documentElement.outerHTML, paragraphs, metadata };
   dom.window.close();
+  coreDom.window.close();
   return result;
 }
 
@@ -138,6 +145,8 @@ test("dashboard removed; the intro is hidden by default, outside the CV and excl
   assert.equal(intro.hidden, true);
   assert.equal(intro.getAttribute("aria-hidden"), "true");
   assert.equal(intro.closest("#resume"), null);
+  assert.equal(intro.querySelector("#opening-name").textContent, "");
+  assert.equal(intro.querySelector("#opening-role").textContent, "");
   assert.equal(intro.querySelectorAll("[data-edit-id], .role, .project-card, .capability-list, button, a, [tabindex]").length, 0);
   const rules = [...document.querySelector("#screen-intro-styles").sheet.cssRules];
   const printRule = rules.find((rule) => rule.conditionText === "print").cssRules[0];
@@ -257,27 +266,30 @@ test("intro uses saved identity content and works without visualization librarie
   assert.deepEqual(fixture.errors, []);
 });
 
-test("saved working-style defaults migrate to technical leadership without replacing custom edits", async (context) => {
+test("saved legacy defaults migrate without replacing custom edits", async (context) => {
   const previousCopy = "Clear decisions. Observable systems. Small, reversible changes. Teams that understand why.";
+  const previousHeadline = "Senior Software Engineer & Engineering Lead";
   const fresh = await openFixture();
   context.after(fresh.close);
   const heading = fresh.document.querySelector('[data-edit-id="methods-heading"]').textContent;
   const copy = fresh.document.querySelector('[data-edit-id="methods-copy"]').textContent;
+  const headline = fresh.document.querySelector('[data-edit-id="headline"]').textContent;
   assert.equal(heading, "Technical leadership");
   assert.match(copy, /technical direction across teams/);
   assert.match(copy, /reliability, cost, and delivery trade-offs/);
   assert.match(copy, /mentor engineers/);
-  for (const [savedHeading, savedCopy, expectedHeading, expectedCopy] of [
-    ["Ways of working", previousCopy, heading, copy],
-    ["Custom heading", "Custom approach.", "Custom heading", "Custom approach."],
-    ["Custom heading", previousCopy, "Custom heading", copy],
-    ["Ways of working", "Custom approach.", heading, "Custom approach."]
+  for (const [savedHeading, savedCopy, savedHeadline, expectedHeading, expectedCopy, expectedHeadline] of [
+    ["Ways of working", previousCopy, previousHeadline, heading, copy, headline],
+    ["Custom heading", "Custom approach.", "Custom role", "Custom heading", "Custom approach.", "Custom role"],
+    ["Custom heading", previousCopy, previousHeadline, "Custom heading", copy, headline],
+    ["Ways of working", "Custom approach.", previousHeadline, heading, "Custom approach.", headline]
   ]) {
     const fixture = await openFixture({
       localStorage: {
         "will-chen-resume-v7": JSON.stringify({
           "methods-heading": savedHeading,
           "methods-copy": savedCopy,
+          headline: savedHeadline,
           name: "Preserved Name"
         })
       }
@@ -285,6 +297,7 @@ test("saved working-style defaults migrate to technical leadership without repla
     context.after(fixture.close);
     assert.equal(fixture.document.querySelector('[data-edit-id="methods-heading"]').textContent, expectedHeading);
     assert.equal(fixture.document.querySelector('[data-edit-id="methods-copy"]').textContent, expectedCopy);
+    assert.equal(fixture.document.querySelector('[data-edit-id="headline"]').textContent, expectedHeadline);
     assert.equal(fixture.document.querySelector('[data-edit-id="name"]').textContent, "Preserved Name");
     assert.deepEqual(fixture.errors, []);
   }
@@ -328,16 +341,47 @@ test("Word output is identical before and after the intro and contains only resu
   assert.deepEqual(fixture.errors, []);
 });
 
-test("Word export follows edits to both the technical leadership heading and copy", { timeout: 15000 }, async (context) => {
+test("Word export derives identity, contact, headings, labels and footer from the HTML CV", { timeout: 15000 }, async (context) => {
   const fixture = await openFixture();
   context.after(fixture.close);
   fixture.document.querySelector("#edit-toggle").click();
+  fixture.document.querySelector('[data-edit-id="name"]').textContent = "Edited Name";
+  fixture.document.querySelector('[data-edit-id="headline"]').textContent = "Edited Role";
+  fixture.document.querySelector('[data-edit-id="contact"] span').textContent = "Edited City";
+  fixture.document.querySelector('[data-edit-id="profile-heading"]').textContent = "Edited Profile";
+  fixture.document.querySelector('[data-edit-id="experience-heading"]').textContent = "Edited Experience";
+  fixture.document.querySelector('[data-edit-id="capabilities-heading"]').textContent = "Edited Capabilities";
+  fixture.document.querySelector('[data-edit-id="education-heading"]').textContent = "Edited Education";
+  fixture.document.querySelector('[data-edit-id="awards-heading"]').textContent = "Edited Recognition";
   fixture.document.querySelector('[data-edit-id="methods-heading"]').textContent = "Architecture and mentorship";
   fixture.document.querySelector('[data-edit-id="methods-copy"]').textContent = "Custom technical leadership approach.";
+  fixture.document.querySelector('[data-edit-id="projects-kicker"]').textContent = "Edited Projects";
+  fixture.document.querySelector(".stack-line strong").textContent = "Edited Stack";
+  fixture.document.querySelector('[data-edit-id="footer-left"]').textContent = "Edited Footer";
   fixture.document.querySelector("#edit-toggle").click();
   const exported = await wordContent((await fixture.download("word-button")).blob);
-  assert.ok(exported.paragraphs.includes("Architecture and mentorship"));
-  assert.ok(exported.paragraphs.includes("Custom technical leadership approach."));
+  for (const expected of [
+    "Edited Name",
+    "Edited Role",
+    "Edited Profile",
+    "Edited Experience",
+    "Edited Capabilities",
+    "Edited Education",
+    "Edited Recognition",
+    "Architecture and mentorship",
+    "Custom technical leadership approach.",
+    "Edited Projects",
+    "Edited Footer"
+  ]) {
+    assert.ok(exported.paragraphs.includes(expected), `Missing edited HTML content: ${expected}`);
+  }
+  assert.ok(exported.paragraphs.some((paragraph) => paragraph.startsWith("Edited City | ")));
+  assert.ok(exported.paragraphs.some((paragraph) => paragraph.startsWith("Edited Stack: ")));
+  assert.deepEqual(exported.metadata, {
+    creator: "Edited Name",
+    title: "Edited Name Resume",
+    description: "Edited Name - Edited Role"
+  });
   assert.equal(exported.paragraphs.includes("Ways of working"), false);
   assert.deepEqual(fixture.errors, []);
 });
