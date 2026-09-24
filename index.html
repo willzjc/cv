@@ -1999,7 +1999,7 @@
 
   <script>
     (() => {
-      const STORAGE_KEY = "will-chen-resume-v7";
+      const STORAGE_KEY = "will-chen-resume-v8";
       const body = document.body;
       const editToggle = document.querySelector("#edit-toggle");
       const editLabel = editToggle.querySelector(".button-label");
@@ -2200,14 +2200,9 @@
         try {
           const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
           if (!saved || typeof saved !== "object") return;
-          const previousDefaults = {
-            "headline": "Senior Software Engineer & Engineering Lead",
-            "methods-heading": "Ways of working",
-            "methods-copy": "Clear decisions. Observable systems. Small, reversible changes. Teams that understand why."
-          };
           editables.forEach((node) => {
             const editId = node.dataset.editId;
-            if (typeof saved[editId] === "string" && saved[editId] !== previousDefaults[editId]) {
+            if (typeof saved[editId] === "string") {
               node.innerHTML = saved[editId];
             }
           });

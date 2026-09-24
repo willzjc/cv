@@ -255,7 +255,7 @@ test("direct section links, print media and navigation away leave no active over
 test("intro uses saved identity content and works without visualization libraries", async (context) => {
   const fixture = await openFixture({
     withoutD3: true,
-    localStorage: { "will-chen-resume-v7": JSON.stringify({ name: "Will Chen Test", headline: "Engineering Lead Test" }) }
+    localStorage: { "will-chen-resume-v8": JSON.stringify({ name: "Will Chen Test", headline: "Engineering Lead Test" }) }
   });
   context.after(fixture.close);
   assert.equal(fixture.document.querySelector("#opening-intro").hidden, false);
@@ -266,41 +266,34 @@ test("intro uses saved identity content and works without visualization librarie
   assert.deepEqual(fixture.errors, []);
 });
 
-test("saved legacy defaults migrate without replacing custom edits", async (context) => {
-  const previousCopy = "Clear decisions. Observable systems. Small, reversible changes. Teams that understand why.";
-  const previousHeadline = "Senior Software Engineer & Engineering Lead";
-  const fresh = await openFixture();
-  context.after(fresh.close);
-  const heading = fresh.document.querySelector('[data-edit-id="methods-heading"]').textContent;
-  const copy = fresh.document.querySelector('[data-edit-id="methods-copy"]').textContent;
-  const headline = fresh.document.querySelector('[data-edit-id="headline"]').textContent;
-  assert.equal(heading, "Technical leadership");
-  assert.match(copy, /technical direction across teams/);
-  assert.match(copy, /reliability, cost, and delivery trade-offs/);
-  assert.match(copy, /mentor engineers/);
-  for (const [savedHeading, savedCopy, savedHeadline, expectedHeading, expectedCopy, expectedHeadline] of [
-    ["Ways of working", previousCopy, previousHeadline, heading, copy, headline],
-    ["Custom heading", "Custom approach.", "Custom role", "Custom heading", "Custom approach.", "Custom role"],
-    ["Custom heading", previousCopy, previousHeadline, "Custom heading", copy, headline],
-    ["Ways of working", "Custom approach.", previousHeadline, heading, "Custom approach.", headline]
-  ]) {
-    const fixture = await openFixture({
-      localStorage: {
-        "will-chen-resume-v7": JSON.stringify({
-          "methods-heading": savedHeading,
-          "methods-copy": savedCopy,
-          headline: savedHeadline,
-          name: "Preserved Name"
-        })
-      }
-    });
-    context.after(fixture.close);
-    assert.equal(fixture.document.querySelector('[data-edit-id="methods-heading"]').textContent, expectedHeading);
-    assert.equal(fixture.document.querySelector('[data-edit-id="methods-copy"]').textContent, expectedCopy);
-    assert.equal(fixture.document.querySelector('[data-edit-id="headline"]').textContent, expectedHeadline);
-    assert.equal(fixture.document.querySelector('[data-edit-id="name"]').textContent, "Preserved Name");
-    assert.deepEqual(fixture.errors, []);
-  }
+test("stale snapshots are ignored while current-version edits are preserved", async (context) => {
+  const stale = await openFixture({
+    localStorage: {
+      "will-chen-resume-v7": JSON.stringify({
+        name: "Stale Name",
+        headline: "Stale Role",
+        "profile-summary": "Stale profile"
+      })
+    }
+  });
+  const current = await openFixture({
+    localStorage: {
+      "will-chen-resume-v8": JSON.stringify({
+        name: "Preserved Name",
+        headline: "Custom Role",
+        "profile-summary": "Custom profile"
+      })
+    }
+  });
+  context.after(() => { stale.close(); current.close(); });
+  assert.equal(stale.document.querySelector('[data-edit-id="name"]').textContent, "Will Chen");
+  assert.equal(stale.document.querySelector('[data-edit-id="headline"]').textContent, "Principal Engineer | Site Reliability & Platforms");
+  assert.notEqual(stale.document.querySelector('[data-edit-id="profile-summary"]').textContent, "Stale profile");
+  assert.equal(current.document.querySelector('[data-edit-id="name"]').textContent, "Preserved Name");
+  assert.equal(current.document.querySelector('[data-edit-id="headline"]').textContent, "Custom Role");
+  assert.equal(current.document.querySelector('[data-edit-id="profile-summary"]').textContent, "Custom profile");
+  assert.deepEqual(stale.errors, []);
+  assert.deepEqual(current.errors, []);
 });
 
 test("HTML downloads reset transient animation state without sharing the visitor flag", async (context) => {
