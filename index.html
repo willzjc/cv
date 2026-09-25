@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Will Chen - principal-level site reliability and software engineer in Sydney, Australia.">
-  <title>Will Chen | Principal Site Reliability Engineer</title>
+  <meta name="description" content="Will Chen - principal-level software engineer specializing in AI-enabled reliability and platforms in Sydney, Australia.">
+  <title>Will Chen | Principal Software Engineer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
@@ -1311,10 +1311,6 @@
         display: none !important;
       }
 
-      .projects {
-        display: none !important;
-      }
-
       body.is-skill-focused .role,
       body.is-skill-focused .role.is-skill-match {
         opacity: 1 !important;
@@ -1438,30 +1434,63 @@
       }
 
       .projects {
-        margin-top: 5mm;
-        padding-top: 4mm;
+        display: block !important;
+        margin-top: 1.5mm;
+        padding-top: 1.5mm;
         break-before: auto;
+      }
+
+      .projects .section-heading-row {
+        align-items: baseline;
+        margin-bottom: 1mm;
+      }
+
+      .projects .section-kicker,
+      .projects .chart-note,
+      .project-index,
+      .project-url {
+        display: none !important;
+      }
+
+      .projects .section-title {
+        margin: 0 !important;
+        font-size: 10pt;
       }
 
       .projects-grid {
         display: grid !important;
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        gap: 3mm !important;
+        gap: 1.5mm !important;
       }
 
       .project-card {
-        grid-template-columns: 1fr !important;
-        grid-template-rows: 18mm 1fr !important;
+        display: block !important;
+        min-height: 0 !important;
+        border: 0 !important;
+        border-left: 1px solid var(--line) !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
         break-inside: avoid;
       }
 
       .project-visual {
-        border-right: 0 !important;
-        border-bottom: 1px solid var(--line) !important;
+        display: none !important;
       }
 
       .project-copy {
-        padding: 2mm;
+        padding: 0 1.5mm;
+      }
+
+      .project-copy h3 {
+        margin: 0 0 0.5mm;
+        font-family: "DM Sans", sans-serif;
+        font-size: 7pt;
+        font-weight: 700;
+      }
+
+      .project-copy p {
+        font-size: 6pt;
+        line-height: 1.2;
       }
 
       .project-arrow {
@@ -1739,7 +1768,7 @@
       <div>
         <p class="eyebrow editable" data-edit-id="identity-kicker">Principal engineering &middot; AI reliability &middot; Banking platforms</p>
         <h1 class="editable" data-edit-id="name">Will Chen</h1>
-        <p class="headline editable" data-edit-id="headline">Principal SRE | AI-enabled Reliability &amp; Platforms</p>
+        <p class="headline editable" data-edit-id="headline">Principal Software Engineer | AI-enabled Reliability &amp; Platforms</p>
         <div class="contact-line editable" data-edit-id="contact">
           <span>Sydney, Australia</span>
           <a href="tel:+61451952945">+61 451 952 945</a>
@@ -1751,7 +1780,7 @@
     <section class="intro reveal" aria-labelledby="profile-heading" style="--delay: 100ms">
       <div>
         <p class="section-kicker editable" id="profile-heading" data-edit-id="profile-heading">Profile</p>
-        <p class="summary editable" data-edit-id="profile-summary">Principal-level SRE and technology leader with 14+ years of experience designing, building, and operating scalable, resilient systems across cloud and regulated financial services. Currently applies AI-assisted engineering and agentic workflows to production operations: grounding LLM decisions in deployment evidence, validating generated changes through deterministic controls, and keeping high-impact actions auditable, reversible, and human-approved. Combines hands-on software architecture with technical-roadmap ownership, engineering mentorship, and deep reliability experience, including 99.99% availability, 500+ node platforms, multi-region architecture, and complex AWS-to-GCP transformation.</p>
+        <p class="summary editable" data-edit-id="profile-summary">Principal-level software engineer and technology leader with 14+ years of experience designing, building, and operating scalable, resilient systems across cloud and regulated financial services. Currently applies AI-assisted engineering and agentic workflows to production operations: grounding LLM decisions in deployment evidence, validating generated changes through deterministic controls, and keeping high-impact actions auditable, reversible, and human-approved. Combines hands-on software architecture with technical-roadmap ownership, engineering mentorship, and deep reliability experience, including 99.99% availability, 500+ node platforms, multi-region architecture, and complex AWS-to-GCP transformation.</p>
       </div>
     </section>
 
@@ -2006,7 +2035,7 @@
 
   <script>
     (() => {
-      const STORAGE_KEY = "will-chen-resume-v9";
+      const STORAGE_KEY = "will-chen-resume-v10";
       const body = document.body;
       const editToggle = document.querySelector("#edit-toggle");
       const editLabel = editToggle.querySelector(".button-label");
