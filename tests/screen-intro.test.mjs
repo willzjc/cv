@@ -255,7 +255,7 @@ test("direct section links, print media and navigation away leave no active over
 test("intro uses saved identity content and works without visualization libraries", async (context) => {
   const fixture = await openFixture({
     withoutD3: true,
-    localStorage: { "will-chen-resume-v11": JSON.stringify({ name: "Will Chen Test", headline: "Engineering Lead Test" }) }
+    localStorage: { "will-chen-resume-v12": JSON.stringify({ name: "Will Chen Test", headline: "Engineering Lead Test" }) }
   });
   context.after(fixture.close);
   assert.equal(fixture.document.querySelector("#opening-intro").hidden, false);
@@ -269,7 +269,7 @@ test("intro uses saved identity content and works without visualization librarie
 test("stale snapshots are ignored while current-version edits are preserved", async (context) => {
   const stale = await openFixture({
     localStorage: {
-      "will-chen-resume-v10": JSON.stringify({
+      "will-chen-resume-v11": JSON.stringify({
         name: "Stale Name",
         headline: "Stale Role",
         "profile-summary": "Stale profile"
@@ -278,7 +278,7 @@ test("stale snapshots are ignored while current-version edits are preserved", as
   });
   const current = await openFixture({
     localStorage: {
-      "will-chen-resume-v11": JSON.stringify({
+      "will-chen-resume-v12": JSON.stringify({
         name: "Preserved Name",
         headline: "Custom Role",
         "profile-summary": "Custom profile"
