@@ -255,7 +255,7 @@ test("direct section links, print media and navigation away leave no active over
 test("intro uses saved identity content and works without visualization libraries", async (context) => {
   const fixture = await openFixture({
     withoutD3: true,
-    localStorage: { "will-chen-resume-v8": JSON.stringify({ name: "Will Chen Test", headline: "Engineering Lead Test" }) }
+    localStorage: { "will-chen-resume-v9": JSON.stringify({ name: "Will Chen Test", headline: "Engineering Lead Test" }) }
   });
   context.after(fixture.close);
   assert.equal(fixture.document.querySelector("#opening-intro").hidden, false);
@@ -269,7 +269,7 @@ test("intro uses saved identity content and works without visualization librarie
 test("stale snapshots are ignored while current-version edits are preserved", async (context) => {
   const stale = await openFixture({
     localStorage: {
-      "will-chen-resume-v7": JSON.stringify({
+      "will-chen-resume-v8": JSON.stringify({
         name: "Stale Name",
         headline: "Stale Role",
         "profile-summary": "Stale profile"
@@ -278,7 +278,7 @@ test("stale snapshots are ignored while current-version edits are preserved", as
   });
   const current = await openFixture({
     localStorage: {
-      "will-chen-resume-v8": JSON.stringify({
+      "will-chen-resume-v9": JSON.stringify({
         name: "Preserved Name",
         headline: "Custom Role",
         "profile-summary": "Custom profile"
@@ -287,7 +287,7 @@ test("stale snapshots are ignored while current-version edits are preserved", as
   });
   context.after(() => { stale.close(); current.close(); });
   assert.equal(stale.document.querySelector('[data-edit-id="name"]').textContent, "Will Chen");
-  assert.equal(stale.document.querySelector('[data-edit-id="headline"]').textContent, "Principal Engineer | Site Reliability & Platforms");
+  assert.equal(stale.document.querySelector('[data-edit-id="headline"]').textContent, "Principal SRE | AI-enabled Reliability & Platforms");
   assert.notEqual(stale.document.querySelector('[data-edit-id="profile-summary"]').textContent, "Stale profile");
   assert.equal(current.document.querySelector('[data-edit-id="name"]').textContent, "Preserved Name");
   assert.equal(current.document.querySelector('[data-edit-id="headline"]').textContent, "Custom Role");

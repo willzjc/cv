@@ -1733,9 +1733,9 @@
 
     <header class="identity reveal" style="--delay: 40ms">
       <div>
-        <p class="eyebrow editable" data-edit-id="identity-kicker">Principal engineering &middot; Site reliability &middot; Banking platforms</p>
+        <p class="eyebrow editable" data-edit-id="identity-kicker">Principal engineering &middot; AI reliability &middot; Banking platforms</p>
         <h1 class="editable" data-edit-id="name">Will Chen</h1>
-        <p class="headline editable" data-edit-id="headline">Principal Engineer | Site Reliability &amp; Platforms</p>
+        <p class="headline editable" data-edit-id="headline">Principal SRE | AI-enabled Reliability &amp; Platforms</p>
         <div class="contact-line editable" data-edit-id="contact">
           <span>Sydney, Australia</span>
           <a href="tel:+61451952945">+61 451 952 945</a>
@@ -1747,7 +1747,7 @@
     <section class="intro reveal" aria-labelledby="profile-heading" style="--delay: 100ms">
       <div>
         <p class="section-kicker editable" id="profile-heading" data-edit-id="profile-heading">Profile</p>
-        <p class="summary editable" data-edit-id="profile-summary">Principal-level engineer and technology leader with 14+ years of experience designing, building, and operating scalable, resilient systems across cloud and regulated financial services. Combines hands-on software architecture with pragmatic technical leadership: setting direction, translating business needs into extensible solutions, mentoring engineers, and improving reliability through automation, observability, incident learning, and disciplined delivery. Proven at 99.99% availability, 500+ node platforms, multi-region architecture, and complex transformation across AWS, GCP, data, and banking environments.</p>
+        <p class="summary editable" data-edit-id="profile-summary">Principal-level SRE and technology leader with 14+ years of experience designing, building, and operating scalable, resilient systems across cloud and regulated financial services. Currently applies AI-assisted engineering and agentic workflows to production operations: grounding LLM decisions in deployment evidence, validating generated changes through deterministic controls, and keeping high-impact actions auditable, reversible, and human-approved. Combines hands-on software architecture with technical-roadmap ownership, engineering mentorship, and deep reliability experience, including 99.99% availability, 500+ node platforms, multi-region architecture, and complex AWS-to-GCP transformation.</p>
       </div>
     </section>
 
@@ -1769,13 +1769,15 @@
           </header>
           <ul class="role-points editable" data-edit-id="atlassian-points">
             <li>Set database architecture direction for a large-scale AWS-to-GCP migration, anticipating schema extensibility, data compatibility, migration sequencing, and safe rollout controls.</li>
-            <li>Engineered a self-healing deployment framework that validates generated code, classifies failures, and automatically remediates delivery-pipeline issues to reduce operational toil.</li>
+            <li>Design and build an AI-assisted, self-healing deployment framework that interprets build and rollout evidence, classifies failures, proposes targeted remediations, and re-validates generated changes before release.</li>
+            <li>Engineer guardrails for agentic operations using deterministic policy and test gates, scoped permissions, complete decision trails, feature flags, human approval for high-impact actions, and automated rollback.</li>
+            <li>Apply LLM-assisted workflows to incident triage by grounding analysis in telemetry, deployment context, and runbooks so engineers can move faster from noisy symptoms to testable hypotheses and recovery actions.</li>
             <li>Established cloud-agnostic alerting as a shared reliability control, preserving actionable observability through provider migration and reducing monitoring blind spots.</li>
             <li>Raise engineering quality through code and design reviews, coaching engineers on coding standards, documentation, and feature-flag practices that reduce release risk.</li>
           </ul>
           <div class="stack-line">
             <strong>Tech Stack</strong>
-            <span class="editable tech-items" data-edit-id="atlassian-stack">AWS &middot; GCP &middot; Database architecture &middot; CI/CD &middot; Observability &middot; Java &middot; Kotlin &middot; Spinnaker &middot; Kubernetes</span>
+            <span class="editable tech-items" data-edit-id="atlassian-stack">AI-assisted engineering &middot; Agentic workflows &middot; LLM grounding &middot; AWS &middot; GCP &middot; CI/CD &middot; Observability &middot; Java &middot; Kotlin &middot; Spinnaker &middot; Kubernetes</span>
           </div>
         </article>
 
@@ -1902,6 +1904,7 @@
         <section class="sidebar-section">
           <h2 class="sidebar-label editable" data-edit-id="capabilities-heading">Core capabilities</h2>
           <ul class="capability-list editable" data-edit-id="capabilities-list">
+            <li><strong>AI for operations</strong><span>LLM-assisted incident triage, agentic remediation, evidence grounding, evaluation gates, human-in-the-loop controls, auditability, rollback safety</span></li>
             <li><strong>Languages</strong><span>Python, Scala, Ruby, TypeScript, JavaScript, Java, C#</span></li>
             <li><strong>Cloud &amp; architecture</strong><span>Scalable and resilient design, AWS, GCP, Azure, serverless systems, distributed platforms, API design</span></li>
             <li><strong>SRE &amp; DevOps</strong><span>Reliability strategy, incident management, observability, infrastructure as code, CI/CD, Kubernetes, automation</span></li>
@@ -1930,7 +1933,7 @@
 
         <section class="sidebar-section">
           <h2 class="sidebar-label editable" data-edit-id="methods-heading">Technical leadership</h2>
-          <p class="principles editable" data-edit-id="methods-copy">Set technical direction across teams, align architecture with business priorities, and make reliability, cost, and delivery trade-offs explicit. Establish shared engineering standards and mentor engineers to lead complex designs and take ownership of production systems.</p>
+          <p class="principles editable" data-edit-id="methods-copy">Set technical direction across teams, align architecture with business priorities, and make reliability, security, cost, and delivery trade-offs explicit. Introduce AI where it improves operational decisions while treating model output as untrusted input: ground it in controlled evidence, evaluate it, constrain its permissions, preserve audit trails, and retain accountable human control.</p>
         </section>
       </aside>
     </div>
@@ -1999,7 +2002,7 @@
 
   <script>
     (() => {
-      const STORAGE_KEY = "will-chen-resume-v8";
+      const STORAGE_KEY = "will-chen-resume-v9";
       const body = document.body;
       const editToggle = document.querySelector("#edit-toggle");
       const editLabel = editToggle.querySelector(".button-label");
@@ -2023,9 +2026,19 @@
             relevance: "Data integrity, service continuity, and lower migration rework and cutover risk."
           },
           {
-            title: "Self-healing delivery pipeline",
-            work: "Generated-code validation, failure classification, remediation steps, and CI/CD feedback loops.",
-            relevance: "Faster recovery from failed builds, less manual intervention, and more predictable delivery."
+            title: "AI-assisted deployment remediation",
+            work: "Evidence collection from builds and rollouts, LLM-assisted failure classification, targeted remediation generation, and deterministic re-validation in the CI/CD feedback loop.",
+            relevance: "Less operational toil and a faster path from failed deployment to a safe, reviewable remediation."
+          },
+          {
+            title: "Agentic-operation guardrails",
+            work: "Policy and test gates, least-privilege execution, decision logging, human approval boundaries, feature flags, and automated rollback paths.",
+            relevance: "AI automation that remains constrained, explainable, auditable, and recoverable in a production environment."
+          },
+          {
+            title: "LLM-assisted incident triage",
+            work: "Grounded analysis across telemetry, deployment context, and runbooks, producing testable hypotheses and recommended recovery actions for engineers.",
+            relevance: "Faster investigation without allowing probabilistic model output to become an unverified production action."
           },
           {
             title: "Cloud-agnostic alerting",
@@ -2676,7 +2689,7 @@
 
       function indexRoleEvidence() {
         const categoryEvidence = {
-          atlassian: ["languages", "cloudarchitecture", "sredevops", "leadership", "technicalstrategy", "teamcoaching", "codeanddesignreview", "distributedplatforms"],
+          atlassian: ["aiforoperations", "llmassistedincidenttriage", "agenticremediation", "evidencegrounding", "evaluationgates", "humanintheloopcontrols", "auditability", "rollbacksafety", "languages", "cloudarchitecture", "sredevops", "leadership", "technicalstrategy", "teamcoaching", "codeanddesignreview", "distributedplatforms"],
           aws: ["languages", "cloudarchitecture", "sredevops", "dataplatforms", "leadership", "serverlesssystems", "distributedplatforms", "apidesign", "infrastructureascode", "incidentreduction", "dataengineering", "technicalstrategy", "teamcoaching", "deliveryplanning", "stakeholdermanagement", "codeanddesignreview"],
           westpac: ["languages", "dataplatforms", "leadership", "markets", "javascript", "dataengineering", "distributedplatforms", "apidesign", "teamcoaching", "deliveryplanning", "stakeholdermanagement", "fixedincome", "fx", "institutionalmarkets"],
           commonwealth: ["languages", "cloudarchitecture", "sredevops", "dataplatforms", "leadership", "docker", "infrastructureascode", "incidentreduction", "dataengineering", "distributedplatforms"],
