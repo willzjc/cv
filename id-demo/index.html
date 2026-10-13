@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="An interactive, non-official digital card with a motion-reactive iridescent background.">
+  <meta name="theme-color" content="#111111">
+  <title>Digital ID | Interactive prototype</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <main class="workspace">
+    <article class="digital-card" id="digital-card" aria-labelledby="card-heading">
+      <header class="card-header">
+        <button id="motion-button" class="header-control" type="button" aria-pressed="false" title="Toggle phone motion">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M10 17h4M3 8l-2 4 2 4M21 8l2 4-2 4"/></svg>
+          <span id="motion-button-label" class="sr-only">Enable motion</span>
+        </button>
+        <h1 id="card-heading">Digital ID</h1>
+        <button id="edit-button" class="header-control" type="button" aria-label="Edit details" title="Edit details and images">
+          <svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>
+        </button>
+      </header>
+      <div class="invalid-banner">NOT VALID IDENTIFICATION</div>
+      <div class="card-body">
+        <div class="hologram" aria-hidden="true"><div class="hologram-colour"></div></div>
+        <div class="card-content">
+          <div class="portrait-row">
+            <div class="concept-mark" id="logo-container" aria-label="Personal card concept">
+              <div id="logo-placeholder"><span>iD</span><small>CONCEPT</small></div>
+              <img id="logo-image" alt="Custom personal logo" hidden>
+            </div>
+            <div class="portrait" id="portrait-container" aria-label="Illustrated placeholder portrait">
+              <svg id="portrait-placeholder" viewBox="0 0 200 250" role="img" aria-label="Abstract illustrated person, not a photograph">
+                <defs>
+                  <linearGradient id="portrait-background" x2="1" y2="1"><stop stop-color="#c5d5c5"/><stop offset="1" stop-color="#748c82"/></linearGradient>
+                  <linearGradient id="portrait-shirt" x2="0" y2="1"><stop stop-color="#334342"/><stop offset="1" stop-color="#182625"/></linearGradient>
+                </defs>
+                <path fill="url(#portrait-background)" d="M0 0h200v250H0z"/>
+                <circle cx="145" cy="40" r="72" fill="#dde5d2" opacity=".25"/>
+                <path d="M21 250v-31q6-37 57-45h44q51 8 57 45v31" fill="url(#portrait-shirt)"/>
+                <path d="M78 146v31q22 30 44 0v-31" fill="#c4a88a"/>
+                <ellipse cx="100" cy="102" rx="45" ry="59" fill="#d7bea0"/>
+                <path d="M55 103V75q0-49 47-49t46 49v32l-15-43q-35 18-60 0z" fill="#273632"/>
+                <path d="M75 102h12m26 0h12" stroke="#526052" stroke-width="3" stroke-linecap="round"/>
+                <path d="M90 132q10 6 20 0" fill="none" stroke="#9b795f" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <img id="portrait-image" alt="Selected personal photo" hidden>
+              <span id="portrait-label">ILLUSTRATION</span>
+            </div>
+            <div class="refresh">
+              <span>Refreshed</span>
+              <time id="display-refreshed"><span id="display-refreshed-date"></span><span id="display-refreshed-time"></span></time>
+              <span class="refresh-note">PREVIEW ONLY</span>
+            </div>
+          </div>
+          <h3 id="display-name" class="profile-name">Alex Morgan</h3>
+          <div class="identity-grid ruled">
+            <dl class="profile-fields">
+              <div><dt>Profile number</dt><dd class="profile-number">SAMPLE-0001</dd></div>
+              <div><dt>Collection</dt><dd>Personal</dd></div>
+            </dl>
+            <div class="pattern-tile" id="code-container" aria-label="Decorative pattern. Not a QR code.">
+              <svg id="code-placeholder" viewBox="0 0 160 160" aria-hidden="true">
+                <path fill="currentColor" d="M8 8h40v40H8zm52 0h40v40H60zm52 0h40v40h-40zM8 60h40v40H8zm104 0h40v40h-40zM8 112h40v40H8zm52 0h40v40H60zm52 0h40v40h-40z"/>
+                <circle cx="80" cy="80" r="17" fill="currentColor"/>
+              </svg>
+              <img id="code-image" alt="Selected personal barcode or QR image" hidden>
+              <span id="code-label">DECORATIVE ONLY</span>
+            </div>
+          </div>
+          <dl class="birthdate ruled"><dt>Date of birth</dt><dd id="display-birthdate">02 Sep 1995</dd></dl>
+          <div class="detail-tiles">
+            <dl><dt>Class</dt><dd id="display-class">C</dd></dl>
+            <dl><dt>Conditions</dt><dd id="display-conditions">None</dd></dl>
+          </div>
+          <footer class="card-footer"><span class="footer-dot" aria-hidden="true"></span> Not valid identification <span aria-hidden="true">/</span> Not official verification</footer>
+        </div>
+      </div>
+    </article>
+    <aside class="card-help" aria-label="Card controls">
+      <p class="interaction-help">Phone icon: enable tilt. Three dots: edit details and images.</p>
+      <p id="motion-status" class="status" role="status">Move your pointer or drag the card to shift the light.</p>
+      <p class="privacy-note">Personal design prototype. No server uploads or official verification.</p>
+    </aside>
+  </main>
+
+  <dialog id="details-dialog" aria-labelledby="dialog-title">
+    <form id="details-form">
+      <div class="dialog-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h2 id="dialog-title">Your card details</h2></div><button class="close-button" id="close-dialog" type="button" aria-label="Close editor">&times;</button></div>
+      <p class="dialog-description">These details only change this prototype. They are never sent to a server.</p>
+      <label for="name-input">Display name</label>
+      <input id="name-input" name="name" type="text" required maxlength="64" autocomplete="off" placeholder="Alex Morgan">
+      <label for="birthdate-input">Date of birth</label>
+      <input id="birthdate-input" name="birthdate" type="date" required min="1900-01-01" autocomplete="off">
+      <label for="refreshed-input">Refreshed date and time</label>
+      <input id="refreshed-input" name="refreshed" type="datetime-local" required min="1900-01-01T00:00" max="9999-12-31T23:59" step="60" aria-describedby="refreshed-help">
+      <p id="refreshed-help" class="field-help">A manually chosen preview label, not a live refresh or verification. The date and time display exactly as entered.</p>
+      <label for="class-input">Class</label>
+      <input id="class-input" name="class" type="text" required maxlength="32" autocomplete="off" placeholder="C">
+      <label for="conditions-input">Conditions</label>
+      <input id="conditions-input" name="conditions" type="text" required maxlength="160" autocomplete="off" placeholder="None">
+      <div class="image-field">
+        <div class="image-label"><label for="logo-input">Custom logo</label><button id="remove-logo" class="remove-image" type="button" hidden>Remove logo</button></div>
+        <input id="logo-input" type="file" accept="image/png,image/webp,image/jpeg" aria-describedby="logo-help logo-status">
+        <div class="image-preview" id="logo-preview" hidden><img id="logo-preview-image" alt="Custom logo preview"></div>
+        <p class="field-help" id="logo-help">Choose your own or an authorized logo from your phone. PNG and WebP transparency is preserved. JPG is also supported. Up to 5 MB; nothing is uploaded.</p>
+        <label class="checkbox-label" for="logo-transparency-input"><input id="logo-transparency-input" type="checkbox"> Remove background colour</label>
+        <div class="colour-controls">
+          <label for="logo-colour-input">Transparent colour</label>
+          <input id="logo-colour-input" type="color" value="#000000" disabled>
+          <label for="logo-tolerance-input">Tolerance <output id="logo-tolerance-output" for="logo-tolerance-input">24</output></label>
+          <input id="logo-tolerance-input" type="range" min="0" max="255" step="1" value="24" disabled aria-describedby="logo-tolerance-help">
+        </div>
+        <p class="field-help" id="logo-tolerance-help">0 removes only the exact colour. Higher values also remove nearby shades. This affects every matching pixel, including details inside the logo. Turn off to restore the original colours.</p>
+        <p id="logo-status" class="image-status" role="status"></p>
+      </div>
+      <div class="image-field">
+        <div class="image-label"><label for="photo-input">Your photo</label><button id="remove-photo" class="remove-image" type="button" hidden>Remove photo</button></div>
+        <input id="photo-input" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="photo-help photo-status">
+        <div class="image-preview" id="photo-preview" hidden><img id="photo-preview-image" alt="Photo preview"></div>
+        <p class="field-help" id="photo-help">Tap Choose file to select a photo from your phone's photo library or files. JPG, PNG or WebP, up to 5 MB. Nothing is uploaded.</p>
+        <p id="photo-status" class="image-status" role="status"></p>
+      </div>
+      <div class="image-field">
+        <div class="image-label"><label for="code-input">Personal barcode / QR image</label><button id="remove-code" class="remove-image" type="button" hidden>Remove code</button></div>
+        <input id="code-input" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="code-help code-status">
+        <div class="image-preview" id="code-preview" hidden><img id="code-preview-image" alt="Personal code preview"></div>
+        <p class="field-help" id="code-help">Tap Choose file to select a barcode or QR screenshot from your phone's photo library or files. Use a personal code, such as a profile link, not official ID verification. JPG, PNG or WebP, up to 5 MB.</p>
+        <p id="code-status" class="image-status" role="status"></p>
+      </div>
+      <label class="checkbox-label" for="remember-input"><input id="remember-input" type="checkbox"> Remember on this device</label>
+      <p class="field-help">Leave unchecked on a shared phone. Remembered details and images are stored in this browser, not in the website.</p>
+      <p id="form-status" class="form-status" role="status"></p>
+      <div class="dialog-actions"><button id="reset-details" class="button secondary" type="button">Reset details</button><button id="save-details" class="button primary" type="submit">Save changes</button></div>
+    </form>
+  </dialog>
+  <noscript><p class="noscript-note">Enable JavaScript to edit details or use motion. This card is not valid identification.</p></noscript>
+</body>
+</html>
